@@ -906,7 +906,7 @@ final class PluginTest extends TestCase
 
         $plugin = new Plugin();
         $plugin->activate($composer, $io);
-        
+
         // Test that onPostInstall updates the script even if it exists
         $plugin->onPostInstall($event);
 
