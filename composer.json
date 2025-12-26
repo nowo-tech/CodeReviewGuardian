@@ -55,6 +55,11 @@
             "NowoTech\\CodeReviewGuardian\\Tests\\": "tests/"
         }
     },
+    "files": [
+        "bin/code-review-guardian.sh",
+        "config",
+        "docs/GGA.md"
+    ],
     "extra": {
         "class": "NowoTech\\CodeReviewGuardian\\Plugin",
         "branch-alias": {
