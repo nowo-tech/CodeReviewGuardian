@@ -14,7 +14,7 @@ set -eu
 # Emoji variables
 E_OK="✅"
 E_ERROR="❌"
-E_WARNING="⚠️"
+E_WARNING="⚠️ "
 E_INFO="ℹ️ "
 E_GUARDIAN="🛡️ "
 
