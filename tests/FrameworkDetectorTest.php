@@ -40,14 +40,74 @@ final class FrameworkDetectorTest extends TestCase
         unlink($composerJsonPath);
     }
 
-    public function testDetectYii(): void
+    public function testDetectYii2(): void
     {
-        $composerJsonPath = __DIR__ . '/fixtures/composer-yii.json';
+        $composerJsonPath = __DIR__ . '/fixtures/composer-yii2.json';
         $this->createComposerJson($composerJsonPath, ['yiisoft/yii2' => '^2.0']);
 
         $framework = FrameworkDetector::detect($composerJsonPath);
 
         $this->assertEquals(FrameworkDetector::FRAMEWORK_YII, $framework);
+
+        unlink($composerJsonPath);
+    }
+
+    public function testDetectYii3(): void
+    {
+        $composerJsonPath = __DIR__ . '/fixtures/composer-yii3.json';
+        $this->createComposerJson($composerJsonPath, ['yiisoft/yii' => '^3.0']);
+
+        $framework = FrameworkDetector::detect($composerJsonPath);
+
+        $this->assertEquals(FrameworkDetector::FRAMEWORK_YII, $framework);
+
+        unlink($composerJsonPath);
+    }
+
+    public function testDetectCakePHP(): void
+    {
+        $composerJsonPath = __DIR__ . '/fixtures/composer-cakephp.json';
+        $this->createComposerJson($composerJsonPath, ['cakephp/cakephp' => '^5.0']);
+
+        $framework = FrameworkDetector::detect($composerJsonPath);
+
+        $this->assertEquals(FrameworkDetector::FRAMEWORK_CAKEPHP, $framework);
+
+        unlink($composerJsonPath);
+    }
+
+    public function testDetectLaminas(): void
+    {
+        $composerJsonPath = __DIR__ . '/fixtures/composer-laminas.json';
+        $this->createComposerJson($composerJsonPath, ['laminas/laminas-mvc' => '^3.0']);
+
+        $framework = FrameworkDetector::detect($composerJsonPath);
+
+        $this->assertEquals(FrameworkDetector::FRAMEWORK_LAMINAS, $framework);
+
+        unlink($composerJsonPath);
+    }
+
+    public function testDetectCodeIgniter(): void
+    {
+        $composerJsonPath = __DIR__ . '/fixtures/composer-codeigniter.json';
+        $this->createComposerJson($composerJsonPath, ['codeigniter4/framework' => '^4.0']);
+
+        $framework = FrameworkDetector::detect($composerJsonPath);
+
+        $this->assertEquals(FrameworkDetector::FRAMEWORK_CODEIGNITER, $framework);
+
+        unlink($composerJsonPath);
+    }
+
+    public function testDetectSlim(): void
+    {
+        $composerJsonPath = __DIR__ . '/fixtures/composer-slim.json';
+        $this->createComposerJson($composerJsonPath, ['slim/slim' => '^4.0']);
+
+        $framework = FrameworkDetector::detect($composerJsonPath);
+
+        $this->assertEquals(FrameworkDetector::FRAMEWORK_SLIM, $framework);
 
         unlink($composerJsonPath);
     }
@@ -71,11 +131,78 @@ final class FrameworkDetectorTest extends TestCase
         $this->assertEquals(FrameworkDetector::FRAMEWORK_GENERIC, $framework);
     }
 
-    public function testGetConfigDirectory(): void
+    public function testDetectWithInvalidJson(): void
+    {
+        $composerJsonPath = __DIR__ . '/fixtures/composer-invalid.json';
+        $dir = dirname($composerJsonPath);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+
+        file_put_contents($composerJsonPath, '{ invalid json }');
+
+        $framework = FrameworkDetector::detect($composerJsonPath);
+
+        $this->assertEquals(FrameworkDetector::FRAMEWORK_GENERIC, $framework);
+
+        unlink($composerJsonPath);
+    }
+
+    public function testDetectWithRequireDev(): void
+    {
+        $composerJsonPath = __DIR__ . '/fixtures/composer-require-dev.json';
+        $dir = dirname($composerJsonPath);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+
+        $composerJson = [
+            'name' => 'test/package',
+            'require' => ['some/package' => '^1.0'],
+            'require-dev' => ['symfony/framework-bundle' => '^6.0'],
+        ];
+
+        file_put_contents($composerJsonPath, json_encode($composerJson, JSON_PRETTY_PRINT));
+
+        $framework = FrameworkDetector::detect($composerJsonPath);
+
+        $this->assertEquals(FrameworkDetector::FRAMEWORK_SYMFONY, $framework);
+
+        unlink($composerJsonPath);
+    }
+
+    public function testDetectWithEmptyComposerJson(): void
+    {
+        $composerJsonPath = __DIR__ . '/fixtures/composer-empty.json';
+        $dir = dirname($composerJsonPath);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+
+        file_put_contents($composerJsonPath, '{}');
+
+        $framework = FrameworkDetector::detect($composerJsonPath);
+
+        $this->assertEquals(FrameworkDetector::FRAMEWORK_GENERIC, $framework);
+
+        unlink($composerJsonPath);
+    }
+
+    public function testGetConfigDirectoryForAllFrameworks(): void
     {
         $this->assertEquals('symfony', FrameworkDetector::getConfigDirectory(FrameworkDetector::FRAMEWORK_SYMFONY));
         $this->assertEquals('laravel', FrameworkDetector::getConfigDirectory(FrameworkDetector::FRAMEWORK_LARAVEL));
+        $this->assertEquals('generic', FrameworkDetector::getConfigDirectory(FrameworkDetector::FRAMEWORK_YII));
+        $this->assertEquals('generic', FrameworkDetector::getConfigDirectory(FrameworkDetector::FRAMEWORK_CAKEPHP));
+        $this->assertEquals('generic', FrameworkDetector::getConfigDirectory(FrameworkDetector::FRAMEWORK_LAMINAS));
+        $this->assertEquals('generic', FrameworkDetector::getConfigDirectory(FrameworkDetector::FRAMEWORK_CODEIGNITER));
+        $this->assertEquals('generic', FrameworkDetector::getConfigDirectory(FrameworkDetector::FRAMEWORK_SLIM));
         $this->assertEquals('generic', FrameworkDetector::getConfigDirectory(FrameworkDetector::FRAMEWORK_GENERIC));
+    }
+
+    public function testGetConfigDirectoryWithUnknownFramework(): void
+    {
+        $this->assertEquals('generic', FrameworkDetector::getConfigDirectory('unknown-framework'));
     }
 
     /**
@@ -99,4 +226,3 @@ final class FrameworkDetectorTest extends TestCase
         file_put_contents($path, json_encode($composerJson, JSON_PRETTY_PRINT));
     }
 }
-

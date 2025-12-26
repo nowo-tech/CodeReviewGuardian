@@ -42,6 +42,9 @@
         "phpunit/phpunit": "^9.6 || ^10.0 || ^11.0",
         "friendsofphp/php-cs-fixer": "^3.0"
     },
+    "suggest": {
+        "nowo-tech/composer-update-helper": "Keep your dependencies up to date. Works perfectly with Code Review Guardian to ensure both code quality and dependency management."
+    },
     "autoload": {
         "psr-4": {
             "NowoTech\\CodeReviewGuardian\\": "src/"

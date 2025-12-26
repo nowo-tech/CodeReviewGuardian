@@ -31,7 +31,9 @@ This is the initial release. If you're installing for the first time, follow the
 - Provider-agnostic code review guardian
 - Automatic framework detection
 - Framework-specific configuration files
-- Multiple code quality checks (PHP-CS-Fixer, PHPStan, PHPUnit, Security)
+- Git Guardian Angel (GGA) for automated code reviews
+- AI Agents support (OpenAI, Anthropic, GitHub Copilot)
+- Token configuration via `.env` file
 
 #### Breaking Changes
 

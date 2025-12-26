@@ -31,44 +31,57 @@ The configuration file is automatically generated based on your framework:
 ```yaml
 framework: symfony  # or laravel, generic
 
-checks:
-  php_cs_fixer:
-    enabled: true
-    config: .php-cs-fixer.dist.php
-    paths:
-      - src
-      - tests
-  
-  phpstan:
-    enabled: true
-    level: 5
-    config: phpstan.neon.dist
-  
-  phpunit:
-    enabled: true
-    config: phpunit.xml.dist
-    coverage: true
-    coverage_threshold: 80
-  
-  security_checker:
-    enabled: true
-  
-  twig_lint:  # Symfony only
-    enabled: true
-    paths:
-      - templates
-
+# Git provider settings
 git:
   provider: auto  # auto, github, gitlab, bitbucket
-  api_token_env: GIT_TOKEN
-  repository_url: auto
+  api_token_env: GIT_TOKEN  # Reads from .env file
+  repository_url: auto  # auto-detected from git remote
 
+# Git Guardian Angel (GGA) settings
+gga:
+  enabled: true
+  auto_review: true
+  post_comments: true
+  review_changed_files_only: true
+  max_comments: 50
+  provider: codex  # codex, claude, gemini, ollama
+  file_patterns:
+    - "*.php"
+    - "*.twig"  # or *.blade.php for Laravel
+  exclude_patterns:
+    - "vendor/*"
+    - "var/*"  # or storage/* for Laravel
+    - "public/build/*"
+    - "node_modules/*"
+    - "*.min.js"
+    - "*.map"
+  rules_file: "docs/AGENTS.md"
+  strict_mode: true
+
+# AI Agents configuration
+agents:
+  enabled: false
+  provider: openai  # openai, anthropic, github_copilot
+  model: gpt-4
+  temperature: 0.7
+  review_scope:
+    - code_quality
+    - security
+    - performance
+    - best_practices
+    - documentation
+  behavior:
+    suggest_fixes: true
+    explain_issues: true
+    provide_examples: true
+    severity_threshold: medium
+
+# Code review rules
 rules:
-  block_on_style_failure: true
-  block_on_test_failure: true
-  block_on_coverage_drop: true
+  block_on_critical_issues: true
   block_on_security_issues: true
 
+# Comment settings for PR/MR
 comments:
   enabled: true
   post_review_summary: true
@@ -89,103 +102,11 @@ comments:
 framework: symfony
 ```
 
-### Code Quality Checks
-
-#### `php_cs_fixer`
-
-PHP Code Style checking using PHP-CS-Fixer.
-
-- **Type**: `object`
-- **Default**: Enabled with default paths
-- **Options**:
-  - `enabled`: `true` or `false`
-  - `config`: Path to PHP-CS-Fixer config file (default: `.php-cs-fixer.dist.php`)
-  - `paths`: Array of paths to check (default: `['src', 'tests']`)
-
-```yaml
-php_cs_fixer:
-  enabled: true
-  config: .php-cs-fixer.dist.php
-  paths:
-    - src
-    - tests
-    - app  # Laravel
-```
-
-#### `phpstan`
-
-Static analysis using PHPStan.
-
-- **Type**: `object`
-- **Default**: Enabled at level 5
-- **Options**:
-  - `enabled`: `true` or `false`
-  - `level`: PHPStan level (0-9, default: 5)
-  - `config`: Path to PHPStan config file (default: `phpstan.neon.dist`)
-
-```yaml
-phpstan:
-  enabled: true
-  level: 5
-  config: phpstan.neon.dist
-```
-
-#### `phpunit`
-
-Test execution using PHPUnit.
-
-- **Type**: `object`
-- **Default**: Enabled with coverage
-- **Options**:
-  - `enabled`: `true` or `false`
-  - `config`: Path to PHPUnit config file (default: `phpunit.xml.dist`)
-  - `coverage`: Enable code coverage (default: `true`)
-  - `coverage_threshold`: Minimum coverage percentage (default: `80`)
-
-```yaml
-phpunit:
-  enabled: true
-  config: phpunit.xml.dist
-  coverage: true
-  coverage_threshold: 80
-```
-
-#### `security_checker`
-
-Security vulnerability checking.
-
-- **Type**: `object`
-- **Default**: Enabled
-- **Options**:
-  - `enabled`: `true` or `false`
-
-```yaml
-security_checker:
-  enabled: true
-```
-
-#### `twig_lint` (Symfony only)
-
-Twig template linting.
-
-- **Type**: `object`
-- **Default**: Enabled for Symfony projects
-- **Options**:
-  - `enabled`: `true` or `false`
-  - `paths`: Array of paths containing Twig templates (default: `['templates']`)
-
-```yaml
-twig_lint:
-  enabled: true
-  paths:
-    - templates
-```
-
 ### Git Provider Settings
 
 #### `git`
 
-Git provider configuration (for future PR/MR commenting features).
+Git provider configuration for API access.
 
 - **Type**: `object`
 - **Default**: Auto-detected
@@ -194,6 +115,12 @@ Git provider configuration (for future PR/MR commenting features).
   - `api_token_env`: Environment variable name for API token (default: `GIT_TOKEN`)
   - `repository_url`: Repository URL (default: `auto` - auto-detected from git remote)
 
+**Important**: The token must be set in your `.env` file:
+
+```env
+GIT_TOKEN=your_github_or_gitlab_token_here
+```
+
 ```yaml
 git:
   provider: auto
@@ -201,25 +128,105 @@ git:
   repository_url: auto
 ```
 
+### Git Guardian Angel (GGA) Settings
+
+#### `gga`
+
+Configuration for the Git Guardian Angel code review system.
+
+- **Type**: `object`
+- **Default**: All options enabled
+- **Options**:
+  - `enabled`: Enable/disable GGA (default: `true`)
+  - `auto_review`: Automatically review new PRs/MRs (default: `true`)
+  - `post_comments`: Post review comments to PRs/MRs (default: `true`)
+  - `review_changed_files_only`: Only review changed files (default: `true`)
+  - `max_comments`: Maximum number of comments per review (default: `50`)
+
+```yaml
+gga:
+  enabled: true
+  auto_review: true
+  post_comments: true
+  review_changed_files_only: true
+  max_comments: 50
+  
+  # AI Provider for GGA (codex, claude, gemini, ollama)
+  provider: codex
+  
+  # File patterns to review
+  file_patterns:
+    - "*.php"
+    - "*.twig"  # or *.blade.php for Laravel
+  
+  # Patterns to exclude from review
+  exclude_patterns:
+    - "vendor/*"
+    - "var/*"  # or storage/* for Laravel
+    - "public/build/*"
+    - "node_modules/*"
+    - "*.min.js"
+    - "*.map"
+  
+  # Rules file (relative to project root)
+  rules_file: "docs/AGENTS.md"
+  
+  # Strict mode: fail if response is ambiguous
+  strict_mode: true
+```
+
+### AI Agents Configuration
+
+#### `agents`
+
+Configuration for AI-powered code review agents.
+
+- **Type**: `object`
+- **Default**: Disabled
+- **Options**:
+  - `enabled`: Enable/disable AI agents (default: `false`)
+  - `provider`: AI provider - `openai`, `anthropic`, `github_copilot` (default: `openai`)
+  - `model`: Model to use (default: `gpt-4`)
+  - `temperature`: Temperature setting (default: `0.7`)
+  - `review_scope`: Array of review areas (default: all)
+  - `behavior`: Agent behavior settings
+
+```yaml
+agents:
+  enabled: true
+  provider: openai
+  model: gpt-4
+  temperature: 0.7
+  review_scope:
+    - code_quality
+    - security
+    - performance
+    - best_practices
+    - documentation
+  behavior:
+    suggest_fixes: true
+    explain_issues: true
+    provide_examples: true
+    severity_threshold: medium
+```
+
+See `docs/AGENTS_CONFIG.md` for detailed AI agent configuration instructions.
+
 ### Code Review Rules
 
 #### `rules`
 
-Rules for blocking merges based on check results.
+Rules for blocking merges based on review results.
 
 - **Type**: `object`
 - **Default**: All rules enabled
 - **Options**:
-  - `block_on_style_failure`: Block merge if code style check fails (default: `true`)
-  - `block_on_test_failure`: Block merge if tests fail (default: `true`)
-  - `block_on_coverage_drop`: Block merge if coverage drops below threshold (default: `true`)
+  - `block_on_critical_issues`: Block merge if critical issues found (default: `true`)
   - `block_on_security_issues`: Block merge if security issues found (default: `true`)
 
 ```yaml
 rules:
-  block_on_style_failure: true
-  block_on_test_failure: true
-  block_on_coverage_drop: true
+  block_on_critical_issues: true
   block_on_security_issues: true
 ```
 
@@ -227,7 +234,7 @@ rules:
 
 #### `comments`
 
-Settings for PR/MR comments (future feature).
+Settings for PR/MR comments.
 
 - **Type**: `object`
 - **Default**: All options enabled
@@ -252,17 +259,32 @@ comments:
 ```yaml
 framework: symfony
 
-checks:
-  php_cs_fixer:
-    enabled: true
-    paths:
-      - src
-      - tests
-  
-  twig_lint:
-    enabled: true
-    paths:
-      - templates
+git:
+  provider: auto
+  api_token_env: GIT_TOKEN
+
+gga:
+  enabled: true
+  auto_review: true
+  post_comments: true
+  provider: codex
+  file_patterns:
+    - "*.php"
+    - "*.twig"
+  exclude_patterns:
+    - "vendor/*"
+    - "var/*"
+    - "public/build/*"
+    - "node_modules/*"
+    - "*.min.js"
+    - "*.map"
+  rules_file: "docs/AGENTS.md"
+  strict_mode: true
+
+agents:
+  enabled: false
+  provider: openai
+  model: gpt-4
 ```
 
 ### Laravel
@@ -270,15 +292,32 @@ checks:
 ```yaml
 framework: laravel
 
-checks:
-  php_cs_fixer:
-    enabled: true
-    paths:
-      - app
-      - tests
-  
-  blade_lint:
-    enabled: true
+git:
+  provider: auto
+  api_token_env: GIT_TOKEN
+
+gga:
+  enabled: true
+  auto_review: true
+  post_comments: true
+  provider: codex
+  file_patterns:
+    - "*.php"
+    - "*.blade.php"
+  exclude_patterns:
+    - "vendor/*"
+    - "storage/*"
+    - "public/build/*"
+    - "node_modules/*"
+    - "*.min.js"
+    - "*.map"
+  rules_file: "docs/AGENTS.md"
+  strict_mode: true
+
+agents:
+  enabled: false
+  provider: openai
+  model: gpt-4
 ```
 
 ### Generic PHP
@@ -286,105 +325,72 @@ checks:
 ```yaml
 framework: generic
 
-checks:
-  php_cs_fixer:
-    enabled: true
-    paths:
-      - src
-      - tests
+git:
+  provider: auto
+  api_token_env: GIT_TOKEN
+
+gga:
+  enabled: true
+  auto_review: true
+  post_comments: true
+  provider: codex
+  file_patterns:
+    - "*.php"
+  exclude_patterns:
+    - "vendor/*"
+    - "node_modules/*"
+    - "*.min.js"
+    - "*.map"
+  rules_file: "docs/AGENTS.md"
+  strict_mode: true
+
+agents:
+  enabled: false
+  provider: openai
+  model: gpt-4
 ```
 
-## Examples
+## Environment Variables
 
-### Disable Specific Checks
+Code Review Guardian requires the following environment variable:
 
-```yaml
-checks:
-  php_cs_fixer:
-    enabled: false  # Disable code style checking
-  
-  phpstan:
-    enabled: false  # Disable static analysis
-  
-  phpunit:
-    enabled: true
-    coverage: false  # Disable coverage requirement
+### `GIT_TOKEN`
+
+Git provider API token for posting review comments.
+
+- **Required**: Yes (for posting comments)
+- **Location**: `.env` or `.env.local` file in project root
+- **Format**: Token from your Git provider (GitHub, GitLab, or Bitbucket)
+
+```env
+GIT_TOKEN=your_token_here
 ```
 
-### Adjust Coverage Threshold
+See `docs/GGA.md` for instructions on obtaining tokens for each provider.
 
-```yaml
-checks:
-  phpunit:
-    enabled: true
-    coverage: true
-    coverage_threshold: 90  # Require 90% coverage instead of 80%
+#### Environment File Loading Order
+
+The script loads environment variables from `.env` files in the following order (last one wins):
+
+1. **`.env`** - Base configuration (should be in version control as `.env.example`)
+2. **`.env.local`** - Local overrides (should NOT be in version control, highest priority)
+
+This follows the standard pattern used by Symfony and Laravel frameworks.
+
+**Example:**
+
+```env
+# .env (base configuration, committed to git as .env.example)
+GIT_TOKEN=base_token_here
+
+# .env.local (local overrides, NOT committed, overrides .env)
+GIT_TOKEN=local_token_here  # This value will be used
 ```
 
-### Custom Paths
+**Note**: If the `.env` file doesn't exist, the script will automatically create it with a template. If `.env.example` exists, it will be copied to `.env`. If a required environment variable is missing, it will be added to the appropriate `.env` file.
 
-```yaml
-checks:
-  php_cs_fixer:
-    enabled: true
-    paths:
-      - src
-      - tests
-      - custom/path
-```
+## Additional Resources
 
-### Disable Merge Blocking Rules
-
-```yaml
-rules:
-  block_on_style_failure: false  # Allow merge even if style check fails
-  block_on_test_failure: true
-  block_on_coverage_drop: false  # Allow merge even if coverage drops
-  block_on_security_issues: true
-```
-
-## Troubleshooting
-
-### Configuration File Not Found
-
-If the configuration file is missing:
-
-1. Run `composer install` to regenerate it
-2. The file is automatically created based on your framework
-
-### Framework Not Detected
-
-If your framework is not detected:
-
-1. Check that your framework package is in `composer.json` require or require-dev
-2. The generic configuration will be used if no framework is detected
-3. You can manually set `framework: generic` in the config file
-
-### Custom Configuration Not Applied
-
-If your custom configuration is not being used:
-
-1. Check the file location: `.code-review-guardian.yml` in project root
-2. Verify YAML syntax is correct
-3. Check for typos in configuration keys
-
-## Validation
-
-The configuration file is validated when the script runs:
-
-- Invalid YAML syntax will cause an error
-- Unknown configuration keys are ignored (with a warning in the future)
-- Missing required tools (PHP-CS-Fixer, PHPStan, PHPUnit) are handled gracefully
-
-## Getting Help
-
-For issues with configuration:
-
-1. Check this documentation
-2. Review the [README](../README.md) for usage examples
-3. Open an issue on GitHub with:
-   - Your configuration file (remove sensitive data)
-   - Framework being used
-   - Error messages
-   - Steps to reproduce
-
+- [AGENTS_CONFIG.md](AGENTS_CONFIG.md) - AI Agent configuration guide (package documentation)
+- [GGA.md](GGA.md) - Git Guardian Angel setup guide
+- [README.md](../README.md) - Main documentation

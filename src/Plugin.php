@@ -160,6 +160,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         // Install framework-specific configuration files
         $this->installFrameworkConfig($packageDir, $projectDir, $configDir, $io, $forceUpdate);
 
+        // Install documentation files (AGENTS.md, GGA.md)
+        $this->installDocumentationFiles($packageDir, $projectDir, $io, $forceUpdate);
+
         // Update .gitignore to exclude installed files
         $this->updateGitignore($projectDir, $io);
     }
@@ -203,6 +206,72 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             }
 
             // Only install if file doesn't exist (don't overwrite user's config)
+            if (file_exists($destPath) && !$forceUpdate) {
+                continue;
+            }
+
+            if (file_exists($destPath)) {
+                $io->write(sprintf('<info>Updating %s</info>', $dest));
+            } else {
+                $io->write(sprintf('<info>Installing %s</info>', $dest));
+            }
+
+            copy($sourcePath, $destPath);
+        }
+    }
+
+    /**
+     * Install documentation files (AGENTS.md, GGA.md) to project.
+     *
+     * @param string      $packageDir Package directory
+     * @param string      $projectDir Project directory
+     * @param IOInterface $io         The IO interface
+     * @param bool        $forceUpdate Force update even if files exist
+     */
+    private function installDocumentationFiles(
+        string $packageDir,
+        string $projectDir,
+        IOInterface $io,
+        bool $forceUpdate
+    ): void {
+        $docsDestDir = $projectDir . '/docs';
+
+        // Create docs directory if it doesn't exist
+        if (!is_dir($docsDestDir)) {
+            mkdir($docsDestDir, 0755, true);
+        }
+
+        // Detect framework for framework-specific AGENTS.md
+        $composerJsonPath = $projectDir . '/composer.json';
+        $framework = FrameworkDetector::detect($composerJsonPath);
+        $configDir = FrameworkDetector::getConfigDirectory($framework);
+
+        // AGENTS.md is framework-specific (from config/{framework}/AGENTS.md)
+        // GGA.md is common (from docs/GGA.md)
+        $agentSourcePath = $packageDir . '/config/' . $configDir . '/AGENTS.md';
+        $ggaSourcePath = $packageDir . '/docs/GGA.md';
+
+        // List of documentation files to install (source => dest)
+        $docFiles = [];
+
+        // Framework-specific AGENTS.md
+        if (file_exists($agentSourcePath)) {
+            $docFiles[$agentSourcePath] = 'AGENTS.md';
+        }
+
+        // Common GGA.md
+        if (file_exists($ggaSourcePath)) {
+            $docFiles[$ggaSourcePath] = 'GGA.md';
+        }
+
+        foreach ($docFiles as $sourcePath => $dest) {
+            $destPath = $docsDestDir . '/' . $dest;
+
+            if (!file_exists($sourcePath)) {
+                continue;
+            }
+
+            // Only install if file doesn't exist (don't overwrite user's documentation)
             if (file_exists($destPath) && !$forceUpdate) {
                 continue;
             }

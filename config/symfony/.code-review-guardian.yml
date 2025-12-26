@@ -3,57 +3,73 @@
 
 framework: symfony
 
-# Code quality checks to run
-checks:
-  # PHP Code Style (PHP-CS-Fixer)
-  php_cs_fixer:
-    enabled: true
-    config: .php-cs-fixer.dist.php
-    paths:
-      - src
-      - tests
-
-  # Static Analysis (PHPStan)
-  phpstan:
-    enabled: true
-    level: 5
-    config: phpstan.neon.dist
-
-  # Tests (PHPUnit)
-  phpunit:
-    enabled: true
-    config: phpunit.xml.dist
-    coverage: true
-    coverage_threshold: 80
-
-  # Security Check (Symfony Security Checker)
-  security_checker:
-    enabled: true
-
-  # Twig Template Linting (if Twig is used)
-  twig_lint:
-    enabled: true
-    paths:
-      - templates
-
 # Git provider settings (auto-detected)
 git:
   provider: auto # auto, github, gitlab, bitbucket
+  # Token is read from .env file using the variable name below
+  # Add to your .env file: GIT_TOKEN=your_token_here
   api_token_env: GIT_TOKEN
   repository_url: auto # auto-detected from git remote
 
+# Git Guardian Angel (GGA) settings
+gga:
+  enabled: true
+  auto_review: true # Automatically review new PRs/MRs
+  post_comments: true # Post review comments to PRs/MRs
+  review_changed_files_only: true
+  max_comments: 50
+
+  # AI Provider for GGA (codex, claude, gemini, ollama)
+  provider: codex # codex, claude, gemini, ollama
+
+  # File patterns to review (Symfony uses Twig templates)
+  file_patterns:
+    - "*.php"
+    - "*.twig"
+
+  # Patterns to exclude from review
+  exclude_patterns:
+    - "vendor/*"
+    - "var/*"
+    - "public/build/*"
+    - "node_modules/*"
+    - "*.min.js"
+    - "*.map"
+
+  # Rules file (relative to project root)
+  rules_file: "docs/AGENTS.md"
+
+  # Strict mode: fail if response is ambiguous
+  strict_mode: true
+
+# AI Agents configuration
+agents:
+  enabled: false # Set to true to enable AI-powered code review
+  provider: openai # openai, anthropic, github_copilot
+  model: gpt-4 # Model to use for code review
+  temperature: 0.7
+
+  # What the agent should review
+  review_scope:
+    - code_quality
+    - security
+    - performance
+    - best_practices
+    - documentation
+
+  # Agent behavior
+  behavior:
+    suggest_fixes: true
+    explain_issues: true
+    provide_examples: true
+    severity_threshold: medium # low, medium, high, critical
+
 # Code review rules
 rules:
-  # Block merge if code style fails
-  block_on_style_failure: true
-  
-  # Block merge if tests fail
-  block_on_test_failure: true
-  
-  # Block merge if coverage drops below threshold
-  block_on_coverage_drop: true
-  
-  # Block merge if security issues found
+  # Block merge if review finds critical issues
+  block_on_critical_issues: true
+
+  # Block merge if review finds security issues
   block_on_security_issues: true
 
 # Comment settings for PR/MR
@@ -62,4 +78,3 @@ comments:
   post_review_summary: true
   include_suggestions: true
   format: markdown
-

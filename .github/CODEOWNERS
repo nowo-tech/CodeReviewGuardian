@@ -1,0 +1,21 @@
+# Code Owners for Code Review Guardian
+# These users will be automatically requested for review when someone opens a pull request
+
+# Default owner for everything in the repo
+* @HecFranco
+
+# GitHub Actions workflows
+/.github/ @HecFranco
+
+# Source code
+/src/ @HecFranco
+
+# Tests
+/tests/ @HecFranco
+
+# Shell scripts
+/bin/ @HecFranco
+
+# Configuration files
+/config/ @HecFranco
+

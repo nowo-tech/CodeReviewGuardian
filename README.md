@@ -15,11 +15,8 @@ Provider-agnostic code review guardian for PHP projects. Works with any PHP proj
   - **Laravel**: Optimized configuration for Laravel projects
   - **Generic**: Works with any PHP framework
 - ✅ **Automatic configuration**: Installs framework-specific configuration files
-- ✅ **Code quality checks**:
-  - PHP Code Style (PHP-CS-Fixer)
-  - Static Analysis (PHPStan)
-  - Tests (PHPUnit)
-  - Security checks
+- ✅ **Git Guardian Angel (GGA)**: Provider-agnostic code review system
+- ✅ **AI Agents support**: Configure AI-powered code review agents (OpenAI, Anthropic, GitHub Copilot)
 - ✅ **Provider-agnostic**: Works with GitHub, GitLab, Bitbucket, and any Git hosting service
 - ✅ Automatic installation via Composer plugin
 - ✅ **Configurable**: Easy configuration via YAML file
@@ -30,44 +27,42 @@ Provider-agnostic code review guardian for PHP projects. Works with any PHP proj
 composer require --dev nowo-tech/code-review-guardian
 ```
 
-After installation, the following files will be copied to your project root:
-- `code-review-guardian.sh` - The main script for running code review checks
-- `.code-review-guardian.yml` - Configuration file (framework-specific)
+After installation, the following files will be copied to your project:
+- `code-review-guardian.sh` - The main script for running code review checks (project root)
+- `.code-review-guardian.yml` - Configuration file (framework-specific, project root)
+- `docs/AGENTS.md` - Code review rules file (framework-specific, used by GGA)
+- `docs/GGA.md` - Git Guardian Angel setup guide
 
-**Note:** These files are automatically added to your `.gitignore` during installation to prevent them from being committed to your repository.
+**Note:** Script and config files are automatically added to your `.gitignore` during installation.
+
+### Environment Configuration
+
+Code Review Guardian requires a Git provider API token for posting review comments. Add it to your `.env` file:
+
+```env
+# Git Provider API Token (required for PR/MR comments)
+GIT_TOKEN=your_github_or_gitlab_token_here
+```
+
+See [`docs/TOKEN_SETUP.md`](docs/TOKEN_SETUP.md) for detailed step-by-step instructions on creating accounts and obtaining tokens for GitHub, GitLab, and Bitbucket.
 
 ## Usage
 
-### Run all checks
+### Run code review
 
 ```bash
 ./code-review-guardian.sh
 ```
 
-This will run all available checks:
-- Code style (PHP-CS-Fixer)
-- Static analysis (PHPStan)
-- Tests (PHPUnit)
-- Security checks
+This will run the code review guardian using Git Guardian Angel and AI agents (if enabled).
 
-### Run specific checks
+### Post review comment to PR/MR
 
 ```bash
-# Only code style
-./code-review-guardian.sh --check-style
-
-# Only static analysis
-./code-review-guardian.sh --check-static
-
-# Only tests
-./code-review-guardian.sh --check-tests
-
-# Only security checks
-./code-review-guardian.sh --check-security
-
-# Run multiple specific checks
-./code-review-guardian.sh --check-style --check-tests
+./code-review-guardian.sh --post-comment
 ```
+
+This will post review comments to your pull request or merge request using the Git provider API.
 
 ### Show help
 
@@ -99,22 +94,19 @@ Configuration is stored in `.code-review-guardian.yml`. The file is automaticall
 ```yaml
 framework: symfony
 
-checks:
-  php_cs_fixer:
-    enabled: true
-    config: .php-cs-fixer.dist.php
-    paths:
-      - src
-      - tests
-  phpstan:
-    enabled: true
-    level: 5
-  phpunit:
-    enabled: true
-    coverage: true
-    coverage_threshold: 80
-  twig_lint:
-    enabled: true
+git:
+  provider: auto
+  api_token_env: GIT_TOKEN
+
+gga:
+  enabled: true
+  auto_review: true
+  post_comments: true
+
+agents:
+  enabled: false
+  provider: openai
+  model: gpt-4
 ```
 
 ### Laravel Configuration Example
@@ -122,20 +114,50 @@ checks:
 ```yaml
 framework: laravel
 
-checks:
-  php_cs_fixer:
-    enabled: true
-    config: .php-cs-fixer.dist.php
-    paths:
-      - app
-      - tests
-  blade_lint:
-    enabled: true
+git:
+  provider: auto
+  api_token_env: GIT_TOKEN
+
+gga:
+  enabled: true
+  auto_review: true
+  post_comments: true
+
+agents:
+  enabled: false
+  provider: openai
+  model: gpt-4
 ```
+
+### Git Provider Token Configuration
+
+The configuration file references a token from your `.env` file:
+
+```yaml
+git:
+  api_token_env: GIT_TOKEN  # Reads from .env file
+```
+
+Make sure to add your token to `.env`:
+
+```env
+GIT_TOKEN=your_token_here
+```
+
+See `docs/GGA.md` for provider-specific setup instructions.
 
 ### Customizing Configuration
 
-You can edit `.code-review-guardian.yml` to customize the checks and thresholds according to your project needs.
+You can edit `.code-review-guardian.yml` to customize Git Guardian Angel settings, AI agents configuration, and review rules according to your project needs.
+
+### AI Agents and Git Guardian Angel
+
+Code Review Guardian supports AI-powered code review agents:
+
+- **`docs/AGENTS.md`** - Code review rules file (framework-specific, automatically installed based on detected framework)
+- **`docs/GGA.md`** - Complete setup guide for Git Guardian Angel (provider-agnostic code review system)
+
+For detailed AI agent configuration instructions, see the package documentation in `vendor/nowo-tech/code-review-guardian/docs/AGENTS_CONFIG.md` or check the [Configuration Guide](docs/CONFIGURATION.md).
 
 ## Git Provider Support
 

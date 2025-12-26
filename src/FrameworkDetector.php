@@ -13,13 +13,28 @@ namespace NowoTech\CodeReviewGuardian;
  */
 class FrameworkDetector
 {
+    /** @var string Framework constant for Symfony */
     public const FRAMEWORK_SYMFONY = 'symfony';
+
+    /** @var string Framework constant for Laravel */
     public const FRAMEWORK_LARAVEL = 'laravel';
+
+    /** @var string Framework constant for Yii */
     public const FRAMEWORK_YII = 'yii';
+
+    /** @var string Framework constant for CakePHP */
     public const FRAMEWORK_CAKEPHP = 'cakephp';
+
+    /** @var string Framework constant for Laminas */
     public const FRAMEWORK_LAMINAS = 'laminas';
+
+    /** @var string Framework constant for CodeIgniter */
     public const FRAMEWORK_CODEIGNITER = 'codeigniter';
+
+    /** @var string Framework constant for Slim */
     public const FRAMEWORK_SLIM = 'slim';
+
+    /** @var string Framework constant for generic PHP projects */
     public const FRAMEWORK_GENERIC = 'generic';
 
     /**
