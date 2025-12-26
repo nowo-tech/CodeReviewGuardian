@@ -1,0 +1,65 @@
+# Code Review Guardian Configuration for Symfony
+# Provider-agnostic code review configuration
+
+framework: symfony
+
+# Code quality checks to run
+checks:
+  # PHP Code Style (PHP-CS-Fixer)
+  php_cs_fixer:
+    enabled: true
+    config: .php-cs-fixer.dist.php
+    paths:
+      - src
+      - tests
+
+  # Static Analysis (PHPStan)
+  phpstan:
+    enabled: true
+    level: 5
+    config: phpstan.neon.dist
+
+  # Tests (PHPUnit)
+  phpunit:
+    enabled: true
+    config: phpunit.xml.dist
+    coverage: true
+    coverage_threshold: 80
+
+  # Security Check (Symfony Security Checker)
+  security_checker:
+    enabled: true
+
+  # Twig Template Linting (if Twig is used)
+  twig_lint:
+    enabled: true
+    paths:
+      - templates
+
+# Git provider settings (auto-detected)
+git:
+  provider: auto # auto, github, gitlab, bitbucket
+  api_token_env: GIT_TOKEN
+  repository_url: auto # auto-detected from git remote
+
+# Code review rules
+rules:
+  # Block merge if code style fails
+  block_on_style_failure: true
+  
+  # Block merge if tests fail
+  block_on_test_failure: true
+  
+  # Block merge if coverage drops below threshold
+  block_on_coverage_drop: true
+  
+  # Block merge if security issues found
+  block_on_security_issues: true
+
+# Comment settings for PR/MR
+comments:
+  enabled: true
+  post_review_summary: true
+  include_suggestions: true
+  format: markdown
+
