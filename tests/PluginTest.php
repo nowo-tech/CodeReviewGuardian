@@ -918,4 +918,3 @@ final class PluginTest extends TestCase
         @rmdir($dir);
     }
 }
-
