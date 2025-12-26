@@ -109,4 +109,3 @@ class FrameworkDetector
         return $frameworkDirs[$framework] ?? 'generic';
     }
 }
-

@@ -170,10 +170,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     /**
      * Install framework-specific configuration files.
      *
-     * @param string      $packageDir Package directory
-     * @param string      $projectDir Project directory
-     * @param string      $configDir  Configuration directory name
-     * @param IOInterface $io         The IO interface
+     * @param string      $packageDir  Package directory
+     * @param string      $projectDir  Project directory
+     * @param string      $configDir   Configuration directory name
+     * @param IOInterface $io          The IO interface
      * @param bool        $forceUpdate Force update even if files exist
      */
     private function installFrameworkConfig(
@@ -223,9 +223,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     /**
      * Install documentation files (AGENTS.md, GGA.md) to project.
      *
-     * @param string      $packageDir Package directory
-     * @param string      $projectDir Project directory
-     * @param IOInterface $io         The IO interface
+     * @param string      $packageDir  Package directory
+     * @param string      $projectDir  Project directory
+     * @param IOInterface $io          The IO interface
      * @param bool        $forceUpdate Force update even if files exist
      */
     private function installDocumentationFiles(
@@ -372,4 +372,3 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         }
     }
 }
-
