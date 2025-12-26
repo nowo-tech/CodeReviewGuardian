@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.3] - 2025-12-26
+
+### Fixed
+- Fixed script file (`code-review-guardian.sh`) not being copied or updated during installation and updates
+  - The script now always updates on `composer install` and `composer update` to ensure users have the latest version with bug fixes and new features
+  - Previously, the script would only be copied on first installation and never updated, even when updating to a newer package version
+  - Updated tests to verify script updates correctly on both install and update commands
+
 ## [0.0.2] - 2025-12-26
 
 ### Added

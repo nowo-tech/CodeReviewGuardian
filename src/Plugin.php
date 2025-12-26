@@ -90,6 +90,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public function onPostInstall(Event $event): void
     {
+        // Script file (.sh) will always be updated, config files only if they don't exist
         $this->installFiles($event->getIO(), false);
     }
 
@@ -100,8 +101,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public function onPostUpdate(Event $event): void
     {
-        // Only update .gitignore on updates, don't regenerate files
-        $this->updateGitignoreOnUpdate($event->getIO());
+        // Script file (.sh) will always be updated, config files only if they don't exist
+        $this->installFiles($event->getIO(), false);
     }
 
     /**
@@ -129,6 +130,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $io->write(sprintf('<info>Detected framework: %s</info>', strtoupper($framework)));
 
         // Install code review script
+        // Note: The .sh script is ALWAYS updated to ensure users have the latest version
+        // This is different from config files which are only installed if they don't exist
         $files = [
             'bin/code-review-guardian.sh' => 'code-review-guardian.sh',
         ];
@@ -142,11 +145,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
                 continue;
             }
 
-            // Only install if file doesn't exist (first installation)
-            if (file_exists($destPath) && !$forceUpdate) {
-                continue;
-            }
-
+            // Always update the script file, regardless of $forceUpdate flag
+            // This ensures users always have the latest version with bug fixes and new features
             if (file_exists($destPath)) {
                 $io->write(sprintf('<info>Updating %s</info>', $dest));
             } else {
