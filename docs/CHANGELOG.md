@@ -22,11 +22,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Automatic creation of `.env` file with template if missing
   - Automatic addition of missing environment variables
   - Proper handling of quoted values and comments in `.env` files
+- `.gitattributes` file to ensure proper package distribution (excludes development files)
+- Explicit `files` field in `composer.json` to ensure `bin/code-review-guardian.sh`, `config/`, and `docs/GGA.md` are included in the package
 
 ### Changed
 - Improved code documentation: All PHP code now has complete PHPDoc comments in English
 - Updated GitHub Actions CI/CD pipeline to require 100% code coverage (previously 90%)
 - Enhanced environment file loading order: `.env` (base) → `.env.local` (overrides, higher priority)
+
+### Fixed
+- Fixed package distribution: `bin/code-review-guardian.sh` is now explicitly included in the Composer package via `composer.json` `files` field
+- Fixed `.gitattributes` configuration to ensure all necessary files are included while excluding development-only files
 
 ## [0.0.1] - 2025-12-26
 
