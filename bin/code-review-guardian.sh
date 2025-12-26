@@ -15,8 +15,8 @@ set -eu
 E_OK="✅"
 E_ERROR="❌"
 E_WARNING="⚠️"
-E_INFO="ℹ️"
-E_GUARDIAN="🛡️"
+E_INFO="ℹ️ "
+E_GUARDIAN="🛡️ "
 
 # Configuration file
 CONFIG_FILE="code-review-guardian.yaml"
@@ -43,7 +43,7 @@ EXAMPLES:
 CONFIGURATION:
     Configuration file: $CONFIG_FILE
     The configuration file is automatically generated based on your framework.
-    
+
     Token configuration:
     - Add GIT_TOKEN to your .env file (or .env.local for local overrides)
     - The script reads the token from the environment variable specified in the YAML config
@@ -77,9 +77,9 @@ check_config() {
 # Check dependencies and requirements
 check_dependencies() {
     local MISSING_DEPS=0
-    
+
     echo "$E_INFO Checking dependencies..."
-    
+
     # Check Git
     if ! command -v git >/dev/null 2>&1; then
         echo "$E_ERROR Git is not installed. Please install Git to use Code Review Guardian."
@@ -87,7 +87,7 @@ check_dependencies() {
     else
         echo "$E_OK Git found: $(git --version | head -n1)"
     fi
-    
+
     # Check PHP
     if ! command -v php >/dev/null 2>&1; then
         echo "$E_ERROR PHP is not installed. Please install PHP >= 7.4 to use Code Review Guardian."
@@ -95,7 +95,7 @@ check_dependencies() {
     else
         PHP_VERSION=$(php -r 'echo PHP_VERSION;' 2>/dev/null || echo "unknown")
         echo "$E_OK PHP found: $PHP_VERSION"
-        
+
         # Check PHP version (7.4+)
         PHP_MAJOR=$(echo "$PHP_VERSION" | cut -d. -f1)
         PHP_MINOR=$(echo "$PHP_VERSION" | cut -d. -f2)
@@ -104,7 +104,7 @@ check_dependencies() {
             MISSING_DEPS=1
         fi
     fi
-    
+
     # Check configuration file
     if [ ! -f "$CONFIG_FILE" ]; then
         echo "$E_ERROR Configuration file not found: $CONFIG_FILE"
@@ -113,7 +113,7 @@ check_dependencies() {
     else
         echo "$E_OK Configuration file found: $CONFIG_FILE"
     fi
-    
+
     # Check docs/AGENTS.md (rules file)
     if [ ! -f "docs/AGENTS.md" ]; then
         echo "$E_WARNING Rules file not found: docs/AGENTS.md"
@@ -122,14 +122,14 @@ check_dependencies() {
     else
         echo "$E_OK Rules file found: docs/AGENTS.md"
     fi
-    
+
     # Check if we're in a Git repository
     if ! git rev-parse --git-dir >/dev/null 2>&1; then
         echo "$E_WARNING Not running in a Git repository."
         echo "$E_INFO Code Review Guardian works best in a Git repository with remote configured."
     else
         echo "$E_OK Git repository detected"
-        
+
         # Check if remote is configured (optional but recommended)
         if ! git remote >/dev/null 2>&1 || [ -z "$(git remote)" ]; then
             echo "$E_WARNING No Git remote configured. Some features may not work correctly."
@@ -137,14 +137,14 @@ check_dependencies() {
             echo "$E_OK Git remote configured: $(git remote | head -n1)"
         fi
     fi
-    
+
     if [ $MISSING_DEPS -eq 1 ]; then
         echo ""
         echo "$E_ERROR Some required dependencies are missing."
         echo "$E_INFO Please install missing dependencies and try again."
         return 1
     fi
-    
+
     return 0
 }
 
@@ -154,7 +154,7 @@ load_config() {
         echo "$E_ERROR Configuration file not found: $CONFIG_FILE"
         exit 1
     fi
-    
+
     # Simple YAML parsing for key values (using awk)
     # This is a basic implementation - for production, consider using a proper YAML parser
     echo "$E_INFO Loading configuration from $CONFIG_FILE..."
@@ -166,11 +166,11 @@ load_config() {
 # 2. .env.local (local overrides, not in git)
 load_env_file() {
     local env_file="$1"
-    
+
     if [ ! -f "$env_file" ]; then
         return 1
     fi
-    
+
     # Read .env file line by line
     # Handles: KEY=VALUE, KEY="VALUE", KEY='VALUE'
     # Ignores: comments (#), empty lines, whitespace-only lines
@@ -181,22 +181,22 @@ load_env_file() {
                 continue
                 ;;
         esac
-        
+
         # Trim leading/trailing whitespace
         line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-        
+
         # Skip if empty after trimming
         [ -z "$line" ] && continue
-        
+
         # Check if line contains =
         if echo "$line" | grep -q '='; then
             # Extract key and value
             key=$(echo "$line" | cut -d'=' -f1 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
             value=$(echo "$line" | cut -d'=' -f2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-            
+
             # Remove quotes if present
             value=$(echo "$value" | sed 's/^["'\'']//;s/["'\'']$//')
-            
+
             # Only export if key is not empty
             if [ -n "$key" ]; then
                 export "$key=$value"
@@ -211,7 +211,7 @@ load_env_files() {
     if [ -f ".env" ]; then
         load_env_file ".env"
     fi
-    
+
     # Load .env.local second (local overrides, higher priority)
     if [ -f ".env.local" ]; then
         load_env_file ".env.local"
@@ -222,27 +222,27 @@ load_env_files() {
 get_git_token() {
     # Read token environment variable name from config
     TOKEN_ENV_NAME=$(grep -A 2 "api_token_env:" "$CONFIG_FILE" | grep -v "^#" | head -1 | awk '{print $2}' | tr -d '"' || echo "GIT_TOKEN")
-    
+
     # Default to GIT_TOKEN if not found in config
     if [ -z "$TOKEN_ENV_NAME" ] || [ "$TOKEN_ENV_NAME" = "api_token_env:" ]; then
         TOKEN_ENV_NAME="GIT_TOKEN"
     fi
-    
+
     # Load .env files in correct order (.env, then .env.local)
     load_env_files
-    
+
     # Get token from environment (after loading .env files)
     eval "TOKEN=\$$TOKEN_ENV_NAME" 2>/dev/null || TOKEN=""
-    
+
     # If token is still not found, check if .env files exist
     if [ -z "$TOKEN" ]; then
         echo "$E_WARNING Git token not found: $TOKEN_ENV_NAME"
         echo ""
-        
+
         # Check if .env files exist
         if [ ! -f ".env" ] && [ ! -f ".env.local" ]; then
             echo "$E_INFO No .env file found. Creating .env file from .env.example if it exists..."
-            
+
             # Try to create .env from .env.example if it exists
             if [ -f ".env.example" ]; then
                 cp ".env.example" ".env"
@@ -266,19 +266,19 @@ EOF
             if [ -f ".env" ]; then
                 if ! grep -q "^${TOKEN_ENV_NAME}=" .env && ! grep -q "^${TOKEN_ENV_NAME}=" .env.local 2>/dev/null; then
                     echo "$E_INFO Adding $TOKEN_ENV_NAME to .env file..."
-                    
+
                     # Append token to .env file (use .env.local if it exists, otherwise .env)
                     env_target=".env"
                     if [ -f ".env.local" ]; then
                         env_target=".env.local"
                     fi
-                    
+
                     {
                         echo ""
                         echo "# Git Provider API Token (required for posting comments to PRs/MRs)"
                         echo "$TOKEN_ENV_NAME=your_token_here"
                     } >> "$env_target"
-                    
+
                     echo "$E_OK Added $TOKEN_ENV_NAME to $env_target"
                     echo "$E_INFO Please edit $env_target and set $TOKEN_ENV_NAME with your Git provider token."
                 else
@@ -287,14 +287,14 @@ EOF
                 fi
             fi
         fi
-        
+
         echo ""
         echo "$E_INFO See docs/TOKEN_SETUP.md for detailed step-by-step instructions."
         echo "$E_INFO Order of .env file loading: .env (base) → .env.local (overrides)"
-        
+
         return 1
     fi
-    
+
     echo "$TOKEN"
 }
 
@@ -302,35 +302,41 @@ EOF
 run_review() {
     echo "$E_GUARDIAN Running Code Review Guardian..."
     echo ""
-    
+
     load_config
-    
+
     # Check if GGA is enabled
     GGA_ENABLED=$(grep -A 5 "^gga:" "$CONFIG_FILE" | grep "enabled:" | head -1 | awk '{print $2}' | tr -d '"' || echo "true")
-    
+
     if [ "$GGA_ENABLED" != "true" ] && [ "$GGA_ENABLED" != "True" ]; then
         echo "$E_INFO Git Guardian Angel is disabled in configuration."
         return 0
     fi
-    
+
     echo "$E_INFO Git Guardian Angel is enabled."
     echo "$E_INFO This will review code changes in the current branch/PR/MR."
     echo ""
-    
+
     # Check if agents are enabled
     AGENTS_ENABLED=$(grep -A 2 "^agents:" "$CONFIG_FILE" | grep "enabled:" | head -1 | awk '{print $2}' | tr -d '"' || echo "false")
-    
+
     if [ "$AGENTS_ENABLED" = "true" ] || [ "$AGENTS_ENABLED" = "True" ]; then
         echo "$E_INFO AI Agents are enabled in configuration."
         echo "$E_INFO See docs/AGENTS.md for code review rules (used by GGA)."
     else
-        echo "$E_INFO AI Agents are disabled. Enable them in $CONFIG_FILE to use AI-powered reviews."
+        echo "$E_WARNING AI Agents are disabled in $CONFIG_FILE"
+        echo "$E_WARNING To enable AI-powered code reviews, edit $CONFIG_FILE and set:"
+        echo "$E_WARNING   agents:"
+        echo "$E_WARNING     enabled: true"
+        echo "$E_WARNING     provider: openai  # or anthropic, github_copilot"
+        echo "$E_WARNING     model: gpt-4"
+        echo "$E_WARNING See https://github.com/nowo-tech/code-review-guardian/blob/main/docs/AGENTS_CONFIG.md for detailed configuration instructions"
     fi
-    
+
     echo ""
     echo "$E_INFO Code review functionality is coming soon!"
     echo "$E_INFO This will use Git Guardian Angel to review your code changes."
-    
+
     return 0
 }
 
@@ -338,19 +344,19 @@ run_review() {
 post_comment() {
     echo "$E_INFO Posting review comment to PR/MR..."
     echo ""
-    
+
     check_config
-    
+
     TOKEN=$(get_git_token)
     if [ $? -ne 0 ]; then
         echo "$E_ERROR Cannot post comment without Git token."
         return 1
     fi
-    
+
     echo "$E_INFO Git token found."
     echo "$E_INFO Comment posting functionality is coming soon!"
     echo "$E_INFO This will post review comments to your PR/MR using the Git provider API."
-    
+
     return 0
 }
 
@@ -383,31 +389,31 @@ main() {
     echo "$E_GUARDIAN Code Review Guardian"
     echo "================================"
     echo ""
-    
+
     # Check dependencies first
     if ! check_dependencies; then
         exit 1
     fi
-    
+
     echo ""
     check_config
     echo ""
-    
+
     EXIT_CODE=0
-    
+
     if [ "$POST_COMMENT" = true ]; then
         post_comment || EXIT_CODE=1
     else
         run_review || EXIT_CODE=1
     fi
-    
+
     echo ""
     if [ $EXIT_CODE -eq 0 ]; then
         echo "$E_OK Code review completed!"
     else
         echo "$E_ERROR Code review failed!"
     fi
-    
+
     exit $EXIT_CODE
 }
 
