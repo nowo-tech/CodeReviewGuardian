@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved warning message when AI Agents are disabled
   - Changed from info to warning level for better visibility
   - Added clear instructions on how to enable AI Agents in the configuration file
-  - Added link to detailed documentation: https://github.com/nowo-tech/code-review-guardian/blob/main/docs/AGENTS_CONFIG.md
+  - Added link to detailed documentation: https://github.com/nowo-tech/CodeReviewGuardian/blob/main/docs/AGENTS_CONFIG.md
   - Users now get actionable guidance instead of just an informational message
 
 ## [0.0.3] - 2025-12-26

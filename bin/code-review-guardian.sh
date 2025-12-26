@@ -330,7 +330,7 @@ run_review() {
         echo "$E_WARNING     enabled: true"
         echo "$E_WARNING     provider: openai  # or anthropic, github_copilot"
         echo "$E_WARNING     model: gpt-4"
-        echo "$E_WARNING See https://github.com/nowo-tech/code-review-guardian/blob/main/docs/AGENTS_CONFIG.md for detailed configuration instructions"
+        echo "$E_WARNING See https://github.com/nowo-tech/CodeReviewGuardian/blob/main/docs/AGENTS_CONFIG.md for detailed configuration instructions"
     fi
 
     echo ""
