@@ -13,7 +13,7 @@ This guide will help you upgrade Code Review Guardian to newer versions.
    Check [CHANGELOG.md](CHANGELOG.md) for breaking changes and new features.
 
 3. **Update your configuration** (if needed):
-   The `.code-review-guardian.yml` configuration file is automatically updated during installation.
+   The `code-review-guardian.yaml` configuration file is automatically updated during installation.
    If you have custom modifications, you may need to review and update them.
 
 4. **Update the script** (if needed):
@@ -21,6 +21,62 @@ This guide will help you upgrade Code Review Guardian to newer versions.
    If you have custom modifications, you may need to reapply them.
 
 ## Version-Specific Upgrade Notes
+
+### Upgrading to 0.0.3
+
+#### Breaking Changes
+
+- **Configuration file renamed**: `.code-review-guardian.yml` → `code-review-guardian.yaml`
+  - Removed leading dot for better visibility
+  - Changed extension from `.yml` to `.yaml` (standard YAML extension)
+  - Files now appear together alphabetically: `code-review-guardian.sh` and `code-review-guardian.yaml`
+
+#### Migration Steps
+
+1. **Update the package**:
+   ```bash
+   composer update nowo-tech/code-review-guardian
+   ```
+
+2. **Rename your configuration file** (if you have an existing `.code-review-guardian.yml`):
+   ```bash
+   # Rename the old config file to the new name
+   mv .code-review-guardian.yml code-review-guardian.yaml
+   ```
+   
+   **Note**: If you don't have a custom configuration, the new file will be automatically created during installation.
+
+3. **Update your `.gitignore`** (if needed):
+   - The package automatically updates `.gitignore` to include `code-review-guardian.yaml`
+   - You can manually remove the old entry `.code-review-guardian.yml` if present
+
+4. **Verify the upgrade**:
+   ```bash
+   # Check that both files exist
+   ls -la code-review-guardian.*
+   # Should show: code-review-guardian.sh and code-review-guardian.yaml
+   
+   # Test that the script works
+   ./code-review-guardian.sh
+   ```
+
+#### What Changed
+
+- **Configuration file**: `.code-review-guardian.yml` → `code-review-guardian.yaml`
+  - Same format and content, only filename changed
+  - Both files now appear together when listing files alphabetically
+
+- **Script behavior**: The script (`code-review-guardian.sh`) now automatically updates on every `composer install` and `composer update`
+  - Ensures you always have the latest version with bug fixes and new features
+
+#### Rollback
+
+If you need to rollback to version 0.0.2:
+
+```bash
+composer require --dev nowo-tech/code-review-guardian:^0.0.2
+mv code-review-guardian.yaml .code-review-guardian.yml
+```
 
 ### Upgrading to 0.0.1+
 
@@ -48,7 +104,7 @@ This is the initial release. If you're installing for the first time, follow the
 
 2. The package will automatically:
    - Detect your framework
-   - Install the appropriate configuration file (`.code-review-guardian.yml`)
+   - Install the appropriate configuration file (`code-review-guardian.yaml`)
    - Install the code review script (`code-review-guardian.sh`)
    - Update your `.gitignore` file
 
@@ -59,8 +115,8 @@ This is the initial release. If you're installing for the first time, follow the
 
 4. Customize the configuration file if needed:
    ```bash
-   # Edit .code-review-guardian.yml to customize checks and thresholds
-   nano .code-review-guardian.yml
+   # Edit code-review-guardian.yaml to customize checks and thresholds
+   nano code-review-guardian.yaml
    ```
 
 ## Troubleshooting
@@ -98,7 +154,7 @@ If the configuration file is missing:
 3. You can manually create a configuration file:
    ```bash
    # Copy from the package
-   cp vendor/nowo-tech/code-review-guardian/config/generic/.code-review-guardian.yml .code-review-guardian.yml
+   cp vendor/nowo-tech/code-review-guardian/config/generic/code-review-guardian.yaml code-review-guardian.yaml
    ```
 
 ### Conflicts with custom modifications
@@ -108,7 +164,7 @@ If you've modified the script or configuration and it conflicts with the new ver
 1. Backup your custom files:
    ```bash
    cp code-review-guardian.sh code-review-guardian.sh.backup
-   cp .code-review-guardian.yml .code-review-guardian.yml.backup
+   cp code-review-guardian.yaml code-review-guardian.yaml.backup
    ```
 
 2. Reinstall the package:

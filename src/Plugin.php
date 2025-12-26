@@ -194,7 +194,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
         // List of configuration files to install
         $configFiles = [
-            '.code-review-guardian.yml' => '.code-review-guardian.yml',
+            'code-review-guardian.yaml' => 'code-review-guardian.yaml',
         ];
 
         foreach ($configFiles as $source => $dest) {
@@ -309,7 +309,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $gitignorePath = $projectDir . '/.gitignore';
         $entriesToAdd = [
             'code-review-guardian.sh',
-            '.code-review-guardian.yml',
+            'code-review-guardian.yaml',
         ];
 
         $content = '';

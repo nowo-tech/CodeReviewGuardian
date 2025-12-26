@@ -9,11 +9,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.3] - 2025-12-26
 
+### Changed
+- Renamed configuration file from `.code-review-guardian.yml` to `code-review-guardian.yaml`
+  - Removed leading dot so `code-review-guardian.sh` and `code-review-guardian.yaml` appear together alphabetically
+  - Changed extension from `.yml` to `.yaml` (standard YAML extension)
+  - All configuration files in `config/*/` have been renamed accordingly
+  - **Migration**: If you have an existing `.code-review-guardian.yml` file, you can safely rename it to `code-review-guardian.yaml`. The content remains compatible.
+
 ### Fixed
 - Fixed script file (`code-review-guardian.sh`) not being copied or updated during installation and updates
   - The script now always updates on `composer install` and `composer update` to ensure users have the latest version with bug fixes and new features
   - Previously, the script would only be copied on first installation and never updated, even when updating to a newer package version
   - Updated tests to verify script updates correctly on both install and update commands
+
+### Migration Guide (0.0.2 → 0.0.3)
+
+If you're upgrading from version 0.0.2 or earlier:
+
+1. **Rename your configuration file** (if you have one):
+   ```bash
+   # If you have .code-review-guardian.yml, rename it to code-review-guardian.yaml
+   mv .code-review-guardian.yml code-review-guardian.yaml
+   ```
+
+2. **Update the package**:
+   ```bash
+   composer update nowo-tech/code-review-guardian
+   ```
+
+3. **Update your `.gitignore`** (if you have manual entries):
+   - Remove: `.code-review-guardian.yml`
+   - Ensure: `code-review-guardian.yaml` is present (automatically added during installation)
+
+4. **Verify**:
+   ```bash
+   # The script should work with the new config file name
+   ./code-review-guardian.sh
+   ```
+
+The configuration file format and content remain the same - only the filename changed.
 
 ## [0.0.2] - 2025-12-26
 
@@ -51,7 +85,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Symfony: Optimized configuration for Symfony projects
   - Laravel: Optimized configuration for Laravel projects
   - Generic: Works with any PHP framework (Yii, CakePHP, CodeIgniter, Slim, Laminas, etc.)
-- **Automatic configuration**: Installs framework-specific configuration files (`.code-review-guardian.yml`)
+- **Automatic configuration**: Installs framework-specific configuration files (`code-review-guardian.yaml`)
 - **Git Guardian Angel (GGA)**: Provider-agnostic code review system
   - Automatic review of pull requests and merge requests
   - Post review comments to PRs/MRs
@@ -67,7 +101,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Documentation files**: Automatic installation of documentation
   - `docs/AGENTS.md` - Code review rules file (framework-specific, used by GGA)
   - `docs/GGA.md` - Git Guardian Angel setup guide
-- **Configuration file** (`.code-review-guardian.yml`):
+- **Configuration file** (`code-review-guardian.yaml`):
   - Git provider settings
   - Git Guardian Angel (GGA) configuration
   - AI Agents configuration

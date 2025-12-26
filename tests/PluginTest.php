@@ -108,7 +108,7 @@ final class PluginTest extends TestCase
 
         // Create source files
         file_put_contents($binDir . '/code-review-guardian.sh', '#!/bin/sh\necho "test"');
-        file_put_contents($configSymfonyDir . '/.code-review-guardian.yml', 'framework: symfony');
+        file_put_contents($configSymfonyDir . '/code-review-guardian.yaml', 'framework: symfony');
         file_put_contents($configSymfonyDir . '/AGENTS.md', '# AGENTS');
         $docsSourceDir = $packageDir . '/docs';
         if (!is_dir($docsSourceDir)) {
@@ -143,7 +143,7 @@ final class PluginTest extends TestCase
         $plugin->onPostInstall($event);
 
         $this->assertFileExists($tempDir . '/code-review-guardian.sh');
-        $this->assertFileExists($tempDir . '/.code-review-guardian.yml');
+        $this->assertFileExists($tempDir . '/code-review-guardian.yaml');
         $this->assertFileExists($tempDir . '/docs/AGENTS.md');
         $this->assertFileExists($tempDir . '/docs/GGA.md');
 
@@ -167,7 +167,7 @@ final class PluginTest extends TestCase
         file_put_contents($tempDir . '/composer.json', json_encode($composerJson, JSON_PRETTY_PRINT));
 
         // Create source file
-        file_put_contents($configLaravelDir . '/.code-review-guardian.yml', 'framework: laravel');
+        file_put_contents($configLaravelDir . '/code-review-guardian.yaml', 'framework: laravel');
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -191,8 +191,8 @@ final class PluginTest extends TestCase
         $plugin->activate($composer, $io);
         $plugin->onPostInstall($event);
 
-        $this->assertFileExists($tempDir . '/.code-review-guardian.yml');
-        $content = file_get_contents($tempDir . '/.code-review-guardian.yml');
+        $this->assertFileExists($tempDir . '/code-review-guardian.yaml');
+        $content = file_get_contents($tempDir . '/code-review-guardian.yaml');
         $this->assertStringContainsString('laravel', $content);
 
         // Cleanup
@@ -215,7 +215,7 @@ final class PluginTest extends TestCase
         file_put_contents($tempDir . '/composer.json', json_encode($composerJson, JSON_PRETTY_PRINT));
 
         // Create source file
-        file_put_contents($configGenericDir . '/.code-review-guardian.yml', 'framework: generic');
+        file_put_contents($configGenericDir . '/code-review-guardian.yaml', 'framework: generic');
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -239,8 +239,8 @@ final class PluginTest extends TestCase
         $plugin->activate($composer, $io);
         $plugin->onPostInstall($event);
 
-        $this->assertFileExists($tempDir . '/.code-review-guardian.yml');
-        $content = file_get_contents($tempDir . '/.code-review-guardian.yml');
+        $this->assertFileExists($tempDir . '/code-review-guardian.yaml');
+        $content = file_get_contents($tempDir . '/code-review-guardian.yaml');
         $this->assertStringContainsString('generic', $content);
 
         // Cleanup
@@ -282,7 +282,7 @@ final class PluginTest extends TestCase
 
         $gitignoreContent = file_get_contents($tempDir . '/.gitignore');
         $this->assertStringContainsString('code-review-guardian.sh', $gitignoreContent);
-        $this->assertStringContainsString('.code-review-guardian.yml', $gitignoreContent);
+        $this->assertStringContainsString('code-review-guardian.yaml', $gitignoreContent);
         $this->assertStringContainsString('# Code Review Guardian', $gitignoreContent);
 
         // Cleanup
@@ -301,7 +301,7 @@ final class PluginTest extends TestCase
 
         // Create existing config file with user content
         $existingContent = 'framework: symfony\ncustom: user-config';
-        file_put_contents($tempDir . '/.code-review-guardian.yml', $existingContent);
+        file_put_contents($tempDir . '/code-review-guardian.yaml', $existingContent);
 
         // Create composer.json
         $composerJson = [
@@ -312,7 +312,7 @@ final class PluginTest extends TestCase
 
         // Create source files
         file_put_contents($binDir . '/code-review-guardian.sh', '#!/bin/sh\necho "new script"');
-        file_put_contents($configSymfonyDir . '/.code-review-guardian.yml', 'framework: symfony\nnew: content');
+        file_put_contents($configSymfonyDir . '/code-review-guardian.yaml', 'framework: symfony\nnew: content');
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -334,7 +334,7 @@ final class PluginTest extends TestCase
         $plugin->onPostInstall($event);
 
         // Verify existing config content was preserved (not overwritten)
-        $content = file_get_contents($tempDir . '/.code-review-guardian.yml');
+        $content = file_get_contents($tempDir . '/code-review-guardian.yaml');
         $this->assertEquals($existingContent, $content);
 
         // Verify script was updated (always updated, even if exists)
@@ -406,7 +406,7 @@ final class PluginTest extends TestCase
         // Verify .gitignore was updated
         $gitignoreContent = file_get_contents($tempDir . '/.gitignore');
         $this->assertStringContainsString('code-review-guardian.sh', $gitignoreContent);
-        $this->assertStringContainsString('.code-review-guardian.yml', $gitignoreContent);
+        $this->assertStringContainsString('code-review-guardian.yaml', $gitignoreContent);
 
         // Cleanup
         $this->removeDirectory($tempDir);
@@ -514,7 +514,7 @@ final class PluginTest extends TestCase
         file_put_contents($tempDir . '/composer.json', json_encode($composerJson, JSON_PRETTY_PRINT));
 
         file_put_contents($binDir . '/code-review-guardian.sh', '#!/bin/sh');
-        file_put_contents($configSymfonyDir . '/.code-review-guardian.yml', 'framework: symfony');
+        file_put_contents($configSymfonyDir . '/code-review-guardian.yaml', 'framework: symfony');
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -568,7 +568,7 @@ final class PluginTest extends TestCase
         file_put_contents($binDir . '/code-review-guardian.sh', $newScriptContent);
 
         $newConfigContent = 'framework: symfony\nnew: config';
-        file_put_contents($configSymfonyDir . '/.code-review-guardian.yml', $newConfigContent);
+        file_put_contents($configSymfonyDir . '/code-review-guardian.yaml', $newConfigContent);
 
         $newAgentContent = '# New AGENTS';
         file_put_contents($configSymfonyDir . '/AGENTS.md', $newAgentContent);
@@ -581,7 +581,7 @@ final class PluginTest extends TestCase
         file_put_contents($tempDir . '/code-review-guardian.sh', $oldScriptContent);
 
         $oldConfigContent = 'framework: symfony\nold: config';
-        file_put_contents($tempDir . '/.code-review-guardian.yml', $oldConfigContent);
+        file_put_contents($tempDir . '/code-review-guardian.yaml', $oldConfigContent);
 
         mkdir($tempDir . '/docs', 0777, true);
         file_put_contents($tempDir . '/docs/AGENTS.md', '# Old AGENTS');
@@ -620,7 +620,7 @@ final class PluginTest extends TestCase
 
         // Verify files were updated
         $this->assertFileExists($tempDir . '/code-review-guardian.sh');
-        $this->assertFileExists($tempDir . '/.code-review-guardian.yml');
+        $this->assertFileExists($tempDir . '/code-review-guardian.yaml');
         $this->assertFileExists($tempDir . '/docs/AGENTS.md');
         $this->assertFileExists($tempDir . '/docs/GGA.md');
 
@@ -662,7 +662,7 @@ final class PluginTest extends TestCase
         $this->assertFileExists($tempDir . '/.gitignore');
         $gitignoreContent = file_get_contents($tempDir . '/.gitignore');
         $this->assertStringContainsString('code-review-guardian.sh', $gitignoreContent);
-        $this->assertStringContainsString('.code-review-guardian.yml', $gitignoreContent);
+        $this->assertStringContainsString('code-review-guardian.yaml', $gitignoreContent);
 
         // Cleanup
         @unlink($tempDir . '/.gitignore');
@@ -702,7 +702,7 @@ final class PluginTest extends TestCase
 
         $gitignoreContent = file_get_contents($tempDir . '/.gitignore');
         $this->assertStringContainsString('code-review-guardian.sh', $gitignoreContent);
-        $this->assertStringContainsString('.code-review-guardian.yml', $gitignoreContent);
+        $this->assertStringContainsString('code-review-guardian.yaml', $gitignoreContent);
 
         // Cleanup
         @unlink($tempDir . '/.gitignore');
@@ -756,7 +756,7 @@ final class PluginTest extends TestCase
         $vendorDir = $tempDir . '/vendor';
 
         // Create .gitignore with entries already present
-        $gitignoreContent = "# Code Review Guardian\ncode-review-guardian.sh\n.code-review-guardian.yml\n";
+        $gitignoreContent = "# Code Review Guardian\ncode-review-guardian.sh\ncode-review-guardian.yaml\n";
         file_put_contents($tempDir . '/.gitignore', $gitignoreContent);
 
         $config = $this->createMock(Config::class);
@@ -823,7 +823,7 @@ final class PluginTest extends TestCase
 
         $gitignoreContent = file_get_contents($tempDir . '/.gitignore');
         $this->assertStringContainsString('code-review-guardian.sh', $gitignoreContent);
-        $this->assertStringContainsString('.code-review-guardian.yml', $gitignoreContent);
+        $this->assertStringContainsString('code-review-guardian.yaml', $gitignoreContent);
 
         // Cleanup
         @unlink($tempDir . '/.gitignore');
@@ -951,7 +951,7 @@ final class PluginTest extends TestCase
         file_put_contents($tempDir . '/composer.json', json_encode($composerJson, JSON_PRETTY_PRINT));
 
         file_put_contents($binDir . '/code-review-guardian.sh', '#!/bin/sh');
-        file_put_contents($configSymfonyDir . '/.code-review-guardian.yml', 'framework: symfony');
+        file_put_contents($configSymfonyDir . '/code-review-guardian.yaml', 'framework: symfony');
         file_put_contents($configSymfonyDir . '/AGENTS.md', '# New AGENTS');
         file_put_contents($docsSourceDir . '/GGA.md', '# New GGA');
 

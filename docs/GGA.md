@@ -32,10 +32,10 @@ See [TOKEN_SETUP.md](TOKEN_SETUP.md) for detailed step-by-step instructions on c
 
 ### 3. Configure Code Review Guardian
 
-The configuration file `.code-review-guardian.yml` is automatically installed. Update it to enable Git Guardian Angel:
+The configuration file `code-review-guardian.yaml` is automatically installed. Update it to enable Git Guardian Angel:
 
 ```yaml
-# .code-review-guardian.yml
+# code-review-guardian.yaml
 git:
   provider: auto  # auto-detects GitHub, GitLab, or Bitbucket
   api_token_env: GIT_TOKEN  # Reads from .env file

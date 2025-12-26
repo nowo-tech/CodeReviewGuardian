@@ -19,7 +19,7 @@ E_INFO="ℹ️"
 E_GUARDIAN="🛡️"
 
 # Configuration file
-CONFIG_FILE=".code-review-guardian.yml"
+CONFIG_FILE="code-review-guardian.yaml"
 
 # Show help function
 show_help() {

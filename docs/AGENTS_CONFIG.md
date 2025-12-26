@@ -49,7 +49,7 @@ Code Review Guardian supports multiple AI agent providers:
 GitHub Copilot can be used for code review when running in GitHub Actions:
 
 ```yaml
-# .code-review-guardian.yml
+# code-review-guardian.yaml
 agents:
   provider: github_copilot
   enabled: true
@@ -60,7 +60,7 @@ agents:
 For OpenAI models (GPT-4, GPT-3.5, etc.):
 
 ```yaml
-# .code-review-guardian.yml
+# code-review-guardian.yaml
 agents:
   provider: openai
   model: gpt-4
@@ -77,7 +77,7 @@ OPENAI_API_KEY=your_openai_api_key_here
 For Anthropic Claude models:
 
 ```yaml
-# .code-review-guardian.yml
+# code-review-guardian.yaml
 agents:
   provider: anthropic
   model: claude-3-opus
@@ -91,7 +91,7 @@ ANTHROPIC_API_KEY=your_anthropic_api_key_here
 
 ## Agent Configuration
 
-Configure agents in your `.code-review-guardian.yml`:
+Configure agents in your `code-review-guardian.yaml`:
 
 ```yaml
 agents:

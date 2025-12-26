@@ -30,7 +30,7 @@ composer require --dev nowo-tech/code-review-guardian
 After installation, the following files will be copied to your project:
 - `code-review-guardian.sh` - The main script for running code review checks (project root)
   - **Automatically updated** on every `composer install` and `composer update` to ensure you have the latest version
-- `.code-review-guardian.yml` - Configuration file (framework-specific, project root)
+- `code-review-guardian.yaml` - Configuration file (framework-specific, project root)
   - Only installed if it doesn't exist (to preserve your customizations)
 - `docs/AGENTS.md` - Code review rules file (framework-specific, used by GGA)
 - `docs/GGA.md` - Git Guardian Angel setup guide
@@ -89,7 +89,7 @@ The package **automatically detects** your framework and installs the appropriat
 
 ## Configuration
 
-Configuration is stored in `.code-review-guardian.yml`. The file is automatically generated based on your detected framework.
+Configuration is stored in `code-review-guardian.yaml`. The file is automatically generated based on your detected framework.
 
 ### Symfony Configuration Example
 
@@ -150,7 +150,7 @@ See `docs/GGA.md` for provider-specific setup instructions.
 
 ### Customizing Configuration
 
-You can edit `.code-review-guardian.yml` to customize Git Guardian Angel settings, AI agents configuration, and review rules according to your project needs.
+You can edit `code-review-guardian.yaml` to customize Git Guardian Angel settings, AI agents configuration, and review rules according to your project needs.
 
 ### AI Agents and Git Guardian Angel
 

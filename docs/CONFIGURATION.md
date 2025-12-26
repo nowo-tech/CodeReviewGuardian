@@ -4,7 +4,7 @@ This document describes the configuration options available for Code Review Guar
 
 ## Overview
 
-Code Review Guardian works out of the box with default settings. The configuration file (`.code-review-guardian.yml`) is **automatically generated** based on your detected framework during installation.
+Code Review Guardian works out of the box with default settings. The configuration file (`code-review-guardian.yaml`) is **automatically generated** based on your detected framework during installation.
 
 **Important**: The configuration file is **optional**. You only need to edit it if you want to customize the default behavior.
 
@@ -15,7 +15,7 @@ Code Review Guardian works out of the box with default settings. The configurati
 The configuration file is automatically created at:
 
 ```
-.code-review-guardian.yml
+code-review-guardian.yaml
 ```
 
 ### Auto-Generation
