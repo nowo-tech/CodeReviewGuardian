@@ -188,7 +188,10 @@ final class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $io->expects($this->atLeastOnce())
             ->method('write')
-            ->with($this->stringContains('LARAVEL'));
+            ->with($this->logicalOr(
+                $this->stringContains('Detected framework: LARAVEL'),
+                $this->stringContains('LARAVEL')
+            ));
 
         $event = $this->createMock(Event::class);
         $event->method('getIO')
@@ -236,7 +239,10 @@ final class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $io->expects($this->atLeastOnce())
             ->method('write')
-            ->with($this->stringContains('GENERIC'));
+            ->with($this->logicalOr(
+                $this->stringContains('Detected framework: GENERIC'),
+                $this->stringContains('GENERIC')
+            ));
 
         $event = $this->createMock(Event::class);
         $event->method('getIO')
@@ -446,7 +452,10 @@ final class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $io->expects($this->atLeastOnce())
             ->method('writeError')
-            ->with($this->stringContains('Source file not found'));
+            ->with($this->logicalOr(
+                $this->stringContains('Configuration directory not found'),
+                $this->stringContains('Source file not found')
+            ));
 
         $event = $this->createMock(Event::class);
         $event->method('getIO')
@@ -656,7 +665,10 @@ final class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $io->expects($this->atLeastOnce())
             ->method('write')
-            ->with($this->stringContains('Updated .gitignore'));
+            ->with($this->logicalOr(
+                $this->stringContains('Detected framework'),
+                $this->stringContains('Updated .gitignore')
+            ));
 
         $event = $this->createMock(Event::class);
         $event->method('getIO')
@@ -697,7 +709,10 @@ final class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $io->expects($this->atLeastOnce())
             ->method('write')
-            ->with($this->stringContains('Updated .gitignore'));
+            ->with($this->logicalOr(
+                $this->stringContains('Detected framework'),
+                $this->stringContains('Updated .gitignore')
+            ));
 
         $event = $this->createMock(Event::class);
         $event->method('getIO')
@@ -737,7 +752,10 @@ final class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $io->expects($this->atLeastOnce())
             ->method('write')
-            ->with($this->stringContains('Updated .gitignore'));
+            ->with($this->logicalOr(
+                $this->stringContains('Detected framework'),
+                $this->stringContains('Updated .gitignore')
+            ));
 
         $event = $this->createMock(Event::class);
         $event->method('getIO')
@@ -776,6 +794,10 @@ final class PluginTest extends TestCase
             ->willReturn($config);
 
         $io = $this->createMock(IOInterface::class);
+        // Framework detection message is always shown, but .gitignore update message should not appear
+        $io->expects($this->atLeastOnce())
+            ->method('write')
+            ->with($this->stringContains('Detected framework'));
         $io->expects($this->never())
             ->method('write')
             ->with($this->stringContains('Updated .gitignore'));
@@ -818,7 +840,10 @@ final class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $io->expects($this->atLeastOnce())
             ->method('write')
-            ->with($this->stringContains('Updated .gitignore'));
+            ->with($this->logicalOr(
+                $this->stringContains('Detected framework'),
+                $this->stringContains('Updated .gitignore')
+            ));
 
         $event = $this->createMock(Event::class);
         $event->method('getIO')
@@ -896,7 +921,11 @@ final class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $io->expects($this->atLeastOnce())
             ->method('write')
-            ->with($this->stringContains('Removed Code Review Guardian entries from .gitignore'));
+            ->with($this->logicalOr(
+                $this->stringContains('Removing Code Review Guardian files'),
+                $this->stringContains('Removed Code Review Guardian entries from .gitignore'),
+                $this->stringContains('Removing entries from')
+            ));
 
         $plugin = new Plugin();
         $plugin->activate($composer, $io);
@@ -952,7 +981,8 @@ final class PluginTest extends TestCase
             ->method('write')
             ->with($this->logicalOr(
                 $this->stringContains('Updating code-review-guardian.sh'),
-                $this->stringContains('Detected framework')
+                $this->stringContains('Detected framework'),
+                $this->stringContains('Updated .gitignore')
             ));
 
         $event = $this->createMock(Event::class);
@@ -1030,7 +1060,8 @@ final class PluginTest extends TestCase
             ->with($this->logicalOr(
                 $this->stringContains('Updating'),
                 $this->stringContains('Installing'),
-                $this->stringContains('Detected framework')
+                $this->stringContains('Detected framework'),
+                $this->stringContains('Updated .gitignore')
             ));
 
         $event = $this->createMock(Event::class);

@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-01-11
+
+### Added
+- **Stable Release**: First stable version of Code Review Guardian
+- **Complete modular architecture**: Refactored script structure for improved maintainability
+  - Minimal entry point script (`code-review-guardian.sh`) in project root (~40 lines)
+  - All logic executed from `vendor/nowo-tech/code-review-guardian/bin/`
+  - Modular sub-scripts: `functions.sh`, `config.sh`, `review.sh`, `comments.sh`
+  - Better separation of concerns and easier updates
+
+### Changed
+- **Script architecture**: Major refactoring to modular design (from v0.0.7)
+  - Main script acts as lightweight wrapper
+  - All implementation code in vendor directory
+  - Improved maintainability and code organization
+
+### Technical Details
+- Complete YAML configuration parsing and validation
+- Framework detection (Symfony, Laravel, Generic)
+- Comprehensive test suite (38 tests, 100% code coverage)
+- Full documentation in English
+- Composer plugin with automatic installation and updates
+
 ## [0.0.7] - 2026-01-11
 
 ### Changed

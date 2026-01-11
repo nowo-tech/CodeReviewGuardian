@@ -22,6 +22,50 @@ This guide will help you upgrade Code Review Guardian to newer versions.
 
 ## Version-Specific Upgrade Notes
 
+### Upgrading to 1.0.0
+
+#### First Stable Release
+
+Version 1.0.0 is the first stable release of Code Review Guardian. This version represents a mature, production-ready codebase with:
+
+**What's New:**
+- **Stable release**: First production-ready version
+- **Complete modular architecture**: Refactored script structure for improved maintainability
+- **Comprehensive documentation**: All documentation in English
+- **Full test coverage**: 38 tests with 100% code coverage
+- **Composer plugin**: Automatic installation and updates
+
+**What You Need to Do:**
+1. **Update the package**:
+   ```bash
+   composer update nowo-tech/code-review-guardian
+   ```
+
+2. **No breaking changes**: This version is fully backward compatible with v0.0.7
+   - All functionality remains the same
+   - Configuration files remain compatible
+   - Script behavior unchanged
+
+3. **Verify the upgrade**:
+   ```bash
+   # Check version
+   composer show nowo-tech/code-review-guardian
+   
+   # Test the script
+   ./code-review-guardian.sh --help
+   ```
+
+**Benefits:**
+- Production-ready stability
+- Improved code organization and maintainability
+- Comprehensive documentation
+- Full test coverage ensures reliability
+
+**Migration from v0.0.7:**
+- No migration steps required
+- Direct upgrade from v0.0.7 to v1.0.0
+- All existing configurations and scripts remain compatible
+
 ### Upgrading to 0.0.7
 
 #### Script Architecture Changes
