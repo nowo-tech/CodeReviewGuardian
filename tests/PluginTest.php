@@ -829,6 +829,7 @@ final class PluginTest extends TestCase
                 if (strpos($message, 'Updated .gitignore') !== false) {
                     return false;
                 }
+
                 // Allow other messages
                 return true;
             }))
