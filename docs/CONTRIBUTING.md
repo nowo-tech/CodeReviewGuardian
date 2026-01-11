@@ -12,8 +12,8 @@ This project is maintained by [Héctor Franco Aceituno](https://github.com/HecFr
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/nowo-tech/code-review-guardian.git
-   cd code-review-guardian
+   git clone https://github.com/nowo-tech/CodeReviewGuardian.git
+   cd CodeReviewGuardian
    ```
 
 2. Start the Docker container:
@@ -40,8 +40,8 @@ This project is maintained by [Héctor Franco Aceituno](https://github.com/HecFr
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/nowo-tech/code-review-guardian.git
-   cd code-review-guardian
+   git clone https://github.com/nowo-tech/CodeReviewGuardian.git
+   cd CodeReviewGuardian
    ```
 
 2. Install dependencies:

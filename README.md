@@ -1,6 +1,6 @@
 # Code Review Guardian
 
-[![CI](https://github.com/nowo-tech/code-review-guardian/actions/workflows/ci.yml/badge.svg)](https://github.com/nowo-tech/code-review-guardian/actions/workflows/ci.yml) [![Latest Stable Version](https://poser.pugx.org/nowo-tech/code-review-guardian/v)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![License](https://poser.pugx.org/nowo-tech/code-review-guardian/license)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![PHP Version Require](https://poser.pugx.org/nowo-tech/code-review-guardian/require/php)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![GitHub stars](https://img.shields.io/github/stars/nowo-tech/code-review-guardian.svg?style=social&label=Star)](https://github.com/nowo-tech/code-review-guardian)
+[![CI](https://github.com/nowo-tech/CodeReviewGuardian/actions/workflows/ci.yml/badge.svg)](https://github.com/nowo-tech/CodeReviewGuardian/actions/workflows/ci.yml) [![Latest Stable Version](https://poser.pugx.org/nowo-tech/code-review-guardian/v)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![License](https://poser.pugx.org/nowo-tech/code-review-guardian/license)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![PHP Version Require](https://poser.pugx.org/nowo-tech/code-review-guardian/require/php)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![GitHub stars](https://img.shields.io/github/stars/nowo-tech/CodeReviewGuardian.svg?style=social&label=Star)](https://github.com/nowo-tech/CodeReviewGuardian)
 
 > ⭐ **Found this project useful?** Give it a star on GitHub! It helps us maintain and improve the project.
 
@@ -48,6 +48,27 @@ GIT_TOKEN=your_github_or_gitlab_token_here
 
 See [`docs/TOKEN_SETUP.md`](docs/TOKEN_SETUP.md) for detailed step-by-step instructions on creating accounts and obtaining tokens for GitHub, GitLab, and Bitbucket.
 
+## Current Status
+
+Code Review Guardian provides a complete infrastructure for code review automation:
+
+- ✅ **Fully Implemented:**
+  - Plugin de Composer (instalación automática)
+  - Detección automática de frameworks
+  - Instalación de archivos de configuración
+  - Script de validación de dependencias
+  - Parsing y carga de configuración YAML
+  - Filtrado de archivos según patrones configurados
+  - Lectura de archivos de reglas (AGENTS.md)
+
+- 🚧 **In Development:**
+  - Integración completa con APIs de AI (OpenAI, Anthropic, GitHub Copilot)
+  - Ejecución real de revisión de código usando modelos de AI
+  - Publicación automática de comentarios a PR/MR
+  - Detección automática de Git provider desde URL
+
+El script actualmente valida la configuración, filtra archivos correctamente y está preparado para la integración con APIs de AI. La funcionalidad completa de revisión está en desarrollo activo.
+
 ## Usage
 
 ### Run code review
@@ -56,7 +77,7 @@ See [`docs/TOKEN_SETUP.md`](docs/TOKEN_SETUP.md) for detailed step-by-step instr
 ./code-review-guardian.sh
 ```
 
-This will run the code review guardian using Git Guardian Angel and AI agents (if enabled).
+This will validate configuration, filter files according to your settings, and prepare for code review. Full AI-powered review integration is in active development.
 
 ### Post review comment to PR/MR
 
@@ -64,7 +85,7 @@ This will run the code review guardian using Git Guardian Angel and AI agents (i
 ./code-review-guardian.sh --post-comment
 ```
 
-This will post review comments to your pull request or merge request using the Git provider API.
+This functionality is currently in development. It will post review comments to your pull request or merge request using the Git provider API once fully implemented.
 
 ### Show help
 
@@ -159,7 +180,7 @@ Code Review Guardian supports AI-powered code review agents:
 - **`docs/AGENTS.md`** - Code review rules file (framework-specific, automatically installed based on detected framework)
 - **`docs/GGA.md`** - Complete setup guide for Git Guardian Angel (provider-agnostic code review system)
 
-For detailed AI agent configuration instructions, see the package documentation in `vendor/nowo-tech/code-review-guardian/docs/AGENTS_CONFIG.md` or check the [Configuration Guide](docs/CONFIGURATION.md).
+For detailed AI agent configuration instructions, see the package documentation in `vendor/nowo-tech/code-review-guardian/docs/AGENTS_CONFIG.md` or check the [Configuration Guide](docs/CONFIGURATION.md) in the repository.
 
 ## Git Provider Support
 
@@ -170,7 +191,7 @@ Code Review Guardian is **provider-agnostic** and works with:
 - **Bitbucket** (Bitbucket Pipelines, Pull Requests)
 - **Any Git hosting service** with standard Git operations
 
-The package automatically detects your Git provider from your repository URL.
+Git provider detection is planned for a future release. Currently, you can configure the provider manually in the configuration file.
 
 ## Requirements
 
@@ -222,8 +243,8 @@ If you have PHP and Composer installed locally:
 
 ```bash
 # Clone repository
-git clone https://github.com/nowo-tech/code-review-guardian.git
-cd code-review-guardian
+git clone https://github.com/nowo-tech/CodeReviewGuardian.git
+cd CodeReviewGuardian
 
 # Install dependencies
 composer install

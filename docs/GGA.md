@@ -365,5 +365,5 @@ pipelines:
 
 - [AGENTS_CONFIG.md](AGENTS_CONFIG.md) - AI Agent Configuration
 - [CONFIGURATION.md](CONFIGURATION.md) - Full Configuration Guide (in Code Review Guardian package)
-- [Code Review Guardian README](https://github.com/nowo-tech/code-review-guardian) - Main Documentation
+- [Code Review Guardian README](https://github.com/nowo-tech/CodeReviewGuardian) - Main Documentation
 

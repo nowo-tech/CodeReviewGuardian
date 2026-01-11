@@ -22,6 +22,46 @@ This guide will help you upgrade Code Review Guardian to newer versions.
 
 ## Version-Specific Upgrade Notes
 
+### Upgrading to 0.0.5
+
+#### New Features
+
+- **Complete configuration implementation**: All YAML configuration options are now fully parsed, validated, and applied
+- **Enhanced configuration validation**: Automatic validation of configuration values (types, ranges, valid options)
+- **Improved script output**: All configuration values are now displayed when running the script
+
+#### Changes
+
+- **AGENTS_CONFIG.md included in package**: The file is now included in the Composer package and available in `vendor/`
+- **Documentation URLs updated**: All GitHub repository URLs now use the correct repository name
+
+#### Migration Steps
+
+1. **Update the package**:
+   ```bash
+   composer update nowo-tech/code-review-guardian
+   ```
+
+2. **No configuration changes required**: Your existing `code-review-guardian.yaml` file remains compatible
+
+3. **Verify the upgrade**:
+   ```bash
+   # Run the script to see all configuration options being loaded
+   ./code-review-guardian.sh
+   ```
+
+4. **Check configuration validation**:
+   - The script will now validate all configuration values
+   - Invalid values will show warnings
+   - Review any warnings and update your configuration if needed
+
+#### What's New
+
+- All configuration options are now fully implemented and validated
+- Script output shows all active configuration settings
+- Better error messages for invalid configuration values
+- `docs/AGENTS_CONFIG.md` is now available in the installed package
+
 ### Upgrading to 0.0.3
 
 #### Breaking Changes

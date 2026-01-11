@@ -16,10 +16,10 @@
         "ci",
         "quality-assurance"
     ],
-    "homepage": "https://github.com/nowo-tech/code-review-guardian",
+    "homepage": "https://github.com/nowo-tech/CodeReviewGuardian",
     "support": {
-        "issues": "https://github.com/nowo-tech/code-review-guardian/issues",
-        "source": "https://github.com/nowo-tech/code-review-guardian"
+        "issues": "https://github.com/nowo-tech/CodeReviewGuardian/issues",
+        "source": "https://github.com/nowo-tech/CodeReviewGuardian"
     },
     "authors": [
         {
@@ -58,7 +58,8 @@
     "files": [
         "bin/code-review-guardian.sh",
         "config",
-        "docs/GGA.md"
+        "docs/GGA.md",
+        "docs/AGENTS_CONFIG.md"
     ],
     "extra": {
         "class": "NowoTech\\CodeReviewGuardian\\Plugin",

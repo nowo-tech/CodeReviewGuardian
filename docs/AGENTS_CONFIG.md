@@ -161,5 +161,5 @@ Or integrate into your CI/CD pipeline:
 
 - [Configuration Guide](CONFIGURATION.md) - Full Configuration Guide (in Code Review Guardian package)
 - [Git Guardian Angel Guide](GGA.md)
-- [Code Review Guardian README](https://github.com/nowo-tech/code-review-guardian) - Main Documentation
+- [Code Review Guardian README](https://github.com/nowo-tech/CodeReviewGuardian) - Main Documentation
 

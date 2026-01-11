@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.5] - 2025-12-26
+
+### Added
+- Complete implementation of all YAML configuration options
+  - All configuration values are now parsed, validated, displayed, and applied correctly
+  - Full support for nested configuration values (e.g., `agents.behavior.*`)
+  - Configuration validation (types, ranges, valid values)
+  - All settings are shown in script output when relevant
+
+### Changed
+- Updated all GitHub URLs to use correct repository name (`CodeReviewGuardian` instead of `code-review-guardian`)
+  - README.md badges and links corrected
+  - composer.json homepage and support URLs corrected
+  - All documentation files updated (AGENTS_CONFIG.md, GGA.md, CONTRIBUTING.md)
+- Improved README.md with "Current Status" section
+  - Clearly distinguishes between implemented features and features in development
+  - Updated usage descriptions to reflect actual functionality
+- Enhanced script output to show all configuration values
+  - GGA settings: auto_review, post_comments, max_comments, strict_mode
+  - Agents settings: temperature, behavior.* (suggest_fixes, explain_issues, provide_examples, severity_threshold)
+  - Rules settings: block_on_critical_issues, block_on_security_issues
+  - Comments settings: enabled, post_review_summary, include_suggestions, format
+- Improved configuration validation
+  - Validates max_comments is a number
+  - Validates severity_threshold (low/medium/high/critical)
+  - Validates temperature (0-2 range)
+  - Validates comments.format (markdown/text)
+  - Shows warnings for invalid values
+
+### Fixed
+- Fixed AGENTS_CONFIG.md not being included in Composer package
+  - Added `docs/AGENTS_CONFIG.md` to `files` array in composer.json
+  - File is now available in `vendor/nowo-tech/code-review-guardian/docs/AGENTS_CONFIG.md`
+- Fixed configuration parsing for nested values
+  - `agents.behavior.*` values now parse correctly
+  - All configuration options from YAML are now properly loaded
+
+### Documentation
+- Updated AUDIT_REPORT.md to reflect current state (100% operational)
+- All documentation files reviewed and verified for accuracy
+- GitHub repository URLs corrected throughout all documentation
+
 ## [0.0.4] - 2025-12-26
 
 ### Improved
