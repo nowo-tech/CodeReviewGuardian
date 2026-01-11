@@ -33,12 +33,14 @@ and any Git provider (GitHub, GitLab, Bitbucket, etc.)
 OPTIONS:
     --post-comment        Post review comment to PR/MR (requires Git provider token)
     --dry-run             Show what would be executed without running
+    --debug               Enable debug mode with verbose output
     -h, --help            Show this help message
 
 EXAMPLES:
     $0                              # Run code review
     $0 --post-comment               # Post comment to PR/MR
     $0 --dry-run                    # Show what would be executed
+    $0 --debug                      # Run with debug output
 
 CONFIGURATION:
     Configuration file: $CONFIG_FILE
@@ -93,7 +95,8 @@ check_dependencies() {
         echo "$E_ERROR PHP is not installed. Please install PHP >= 7.4 to use Code Review Guardian."
         MISSING_DEPS=1
     else
-        PHP_VERSION=$(php -r 'echo PHP_VERSION;' 2>/dev/null || echo "unknown")
+        # Get PHP version, redirecting stderr to avoid warnings
+        PHP_VERSION=$(php -r 'echo PHP_VERSION;' 2>/dev/null | head -1 | tr -d '\n' || echo "unknown")
         echo "$E_OK PHP found: $PHP_VERSION"
 
         # Check PHP version (7.4+)
@@ -155,9 +158,9 @@ parse_yaml_value() {
     local default="${3:-}"
 
     if [ -n "$section" ]; then
-        grep -A 20 "^${section}:" "$CONFIG_FILE" 2>/dev/null | grep "^\s*${key}:" | head -1 | awk -F: '{print $2}' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//" || echo "$default"
+        grep -A 20 "^${section}:" "$CONFIG_FILE" 2>/dev/null | grep "^\s*${key}:" | head -1 | awk -F: '{print $2}' | sed 's/#.*$//' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//" || echo "$default"
     else
-        grep "^${key}:" "$CONFIG_FILE" 2>/dev/null | head -1 | awk -F: '{print $2}' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//" || echo "$default"
+        grep "^${key}:" "$CONFIG_FILE" 2>/dev/null | head -1 | awk -F: '{print $2}' | sed 's/#.*$//' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//" || echo "$default"
     fi
 }
 
@@ -184,6 +187,7 @@ load_config() {
     fi
 
     echo "$E_INFO Loading configuration from $CONFIG_FILE..."
+    debug "Config file path: $CONFIG_FILE"
 
     # Load GGA settings
     CONFIG_GGA_ENABLED=$(parse_yaml_value "enabled" "gga" "true")
@@ -343,6 +347,17 @@ EOF
                     } >> "$env_target"
 
                     echo "$E_OK Added $TOKEN_ENV_NAME to $env_target"
+
+                    # Also add to .env.dist if it exists
+                    if [ -f ".env.dist" ] && ! grep -q "^${TOKEN_ENV_NAME}=" .env.dist 2>/dev/null; then
+                        {
+                            echo ""
+                            echo "# Git Provider API Token (required for posting comments to PRs/MRs)"
+                            echo "$TOKEN_ENV_NAME=your_token_here"
+                        } >> ".env.dist"
+                        echo "$E_OK Also added $TOKEN_ENV_NAME to .env.dist"
+                    fi
+
                     echo "$E_INFO Please edit $env_target and set $TOKEN_ENV_NAME with your Git provider token."
                 else
                     echo "$E_INFO Variable $TOKEN_ENV_NAME exists in .env file but is empty or commented out."
@@ -725,9 +740,17 @@ post_comment() {
     return 0
 }
 
+# Debug function (outputs to stderr to not interfere with normal output)
+debug() {
+    if [ "${DEBUG:-false}" = "true" ]; then
+        echo "$E_INFO [DEBUG] $*" >&2
+    fi
+}
+
 # Parse command line arguments
 POST_COMMENT=false
 DRY_RUN=false
+DEBUG=false
 
 for arg in "$@"; do
     case "$arg" in
@@ -740,6 +763,9 @@ for arg in "$@"; do
             ;;
         --dry-run)
             DRY_RUN=true
+            ;;
+        --debug)
+            DEBUG=true
             ;;
         *)
             echo "$E_ERROR Unknown option: $arg"

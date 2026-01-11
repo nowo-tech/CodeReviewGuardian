@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.6] - 2025-12-26
+
+### Fixed
+- Fixed YAML parser to correctly remove comments from parsed values
+  - Values with inline comments (e.g., `provider: codex # codex, claude`) now parse correctly
+  - Comments after `#` are stripped before parsing the value
+- Fixed PHP version check to avoid warnings in output
+  - PHP warnings are now redirected to stderr
+  - Output is cleaned with `head -1` and `tr -d '\n'` to prevent parsing errors
+  - Resolves issues with PHP timezone warnings appearing in script output
+
+### Added
+- Added `--debug` mode for verbose debugging
+  - New `debug()` function outputs debug messages to stderr
+  - Debug messages show configuration loading, file filtering, and other internal operations
+  - Use `./code-review-guardian.sh --debug` to enable debug output
+- Improved token handling in `.env` files
+  - Token is now automatically added to `.env.dist` if it exists
+  - Informative message displayed when token is added to `.env.dist`
+  - Better guidance for users when tokens are missing
+
 ## [0.0.5] - 2025-12-26
 
 ### Added
