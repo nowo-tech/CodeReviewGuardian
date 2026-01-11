@@ -7,7 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.0.6] - 2025-12-26
+## [0.0.7] - 2026-01-11
+
+### Changed
+- **Major refactoring: Script architecture restructured**
+  - Main script (`code-review-guardian.sh`) is now minimal (~40 lines)
+  - The main script acts only as an entry point and delegates to the implementation in vendor
+  - All logic is executed from `vendor/nowo-tech/code-review-guardian/bin/main.sh`
+  - Modular structure with sub-scripts for better maintainability
+  - The script in the project root is now just a lightweight wrapper
+
+### Technical Details
+- Main script automatically detects the vendor directory location
+- Executes the main script from the package installed in vendor
+- Improves separation of concerns and facilitates updates
+- Package code is maintained in vendor, not copied to the project
+
+## [0.0.6] - 2026-01-11
 
 ### Fixed
 - Fixed YAML parser to correctly remove comments from parsed values
@@ -28,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Informative message displayed when token is added to `.env.dist`
   - Better guidance for users when tokens are missing
 
-## [0.0.5] - 2025-12-26
+## [0.0.5] - 2026-01-11
 
 ### Added
 - Complete implementation of all YAML configuration options

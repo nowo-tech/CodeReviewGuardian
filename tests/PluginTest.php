@@ -58,10 +58,14 @@ final class PluginTest extends TestCase
     {
         $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
         $vendorDir = $tempDir . '/vendor';
+        $docsDir = $tempDir . '/docs';
         mkdir($vendorDir, 0777, true);
+        mkdir($docsDir, 0777, true);
 
-        // Create test file
+        // Create test files
         file_put_contents($tempDir . '/code-review-guardian.sh', '#!/bin/sh');
+        file_put_contents($tempDir . '/code-review-guardian.yaml', 'config: true');
+        file_put_contents($docsDir . '/AGENTS.md', '# Agents');
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -79,8 +83,11 @@ final class PluginTest extends TestCase
         $plugin->uninstall($composer, $io);
 
         $this->assertFileDoesNotExist($tempDir . '/code-review-guardian.sh');
+        $this->assertFileDoesNotExist($tempDir . '/code-review-guardian.yaml');
+        $this->assertFileDoesNotExist($docsDir . '/AGENTS.md');
 
         // Cleanup
+        @rmdir($docsDir);
         @rmdir($vendorDir);
         @rmdir($tempDir);
     }
@@ -837,7 +844,7 @@ final class PluginTest extends TestCase
         $vendorDir = $tempDir . '/vendor';
         mkdir($vendorDir, 0777, true);
 
-        // Don't create the file - should handle gracefully
+        // Don't create the files - should handle gracefully
         $config = $this->createMock(Config::class);
         $config->method('get')
             ->with('vendor-dir')
@@ -848,14 +855,62 @@ final class PluginTest extends TestCase
             ->willReturn($config);
 
         $io = $this->createMock(IOInterface::class);
-        $io->expects($this->never())
-            ->method('write');
 
         $plugin = new Plugin();
         $plugin->activate($composer, $io);
         $plugin->uninstall($composer, $io);
 
         // Cleanup
+        @rmdir($vendorDir);
+        @rmdir($tempDir);
+    }
+
+    public function testUninstallRemovesGitignoreEntries(): void
+    {
+        $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
+        $vendorDir = $tempDir . '/vendor';
+        mkdir($vendorDir, 0777, true);
+
+        // Create .gitignore with Code Review Guardian entries
+        $gitignoreContent = "# Some existing entries\n";
+        $gitignoreContent .= "vendor/\n";
+        $gitignoreContent .= "\n";
+        $gitignoreContent .= "# Code Review Guardian\n";
+        $gitignoreContent .= "code-review-guardian.sh\n";
+        $gitignoreContent .= "code-review-guardian.yaml\n";
+        $gitignoreContent .= "\n";
+        $gitignoreContent .= "# Other entries\n";
+        $gitignoreContent .= ".env.local\n";
+
+        file_put_contents($tempDir . '/.gitignore', $gitignoreContent);
+
+        $config = $this->createMock(Config::class);
+        $config->method('get')
+            ->with('vendor-dir')
+            ->willReturn($vendorDir);
+
+        $composer = $this->createMock(Composer::class);
+        $composer->method('getConfig')
+            ->willReturn($config);
+
+        $io = $this->createMock(IOInterface::class);
+        $io->expects($this->atLeastOnce())
+            ->method('write')
+            ->with($this->stringContains('Removed Code Review Guardian entries from .gitignore'));
+
+        $plugin = new Plugin();
+        $plugin->activate($composer, $io);
+        $plugin->uninstall($composer, $io);
+
+        $remainingContent = file_get_contents($tempDir . '/.gitignore');
+        $this->assertStringNotContainsString('code-review-guardian.sh', $remainingContent);
+        $this->assertStringNotContainsString('code-review-guardian.yaml', $remainingContent);
+        $this->assertStringNotContainsString('# Code Review Guardian', $remainingContent);
+        $this->assertStringContainsString('vendor/', $remainingContent);
+        $this->assertStringContainsString('.env.local', $remainingContent);
+
+        // Cleanup
+        @unlink($tempDir . '/.gitignore');
         @rmdir($vendorDir);
         @rmdir($tempDir);
     }

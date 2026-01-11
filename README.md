@@ -28,12 +28,16 @@ composer require --dev nowo-tech/code-review-guardian
 ```
 
 After installation, the following files will be copied to your project:
-- `code-review-guardian.sh` - The main script for running code review checks (project root)
-  - **Automatically updated** on every `composer install` and `composer update` to ensure you have the latest version
+- `code-review-guardian.sh` - Minimal entry point script (project root, ~40 lines)
+  - **Automatically updated** on every `composer install` and `composer update`
+  - Acts as a lightweight wrapper that delegates to the implementation in `vendor/`
+  - Automatically detects vendor directory and executes the main script
 - `code-review-guardian.yaml` - Configuration file (framework-specific, project root)
   - Only installed if it doesn't exist (to preserve your customizations)
 - `docs/AGENTS.md` - Code review rules file (framework-specific, used by GGA)
 - `docs/GGA.md` - Git Guardian Angel setup guide
+
+**Note:** The actual implementation code runs from `vendor/nowo-tech/code-review-guardian/bin/`, keeping your project root clean and minimal.
 
 **Note:** Script and config files are automatically added to your `.gitignore` during installation.
 
@@ -53,21 +57,21 @@ See [`docs/TOKEN_SETUP.md`](docs/TOKEN_SETUP.md) for detailed step-by-step instr
 Code Review Guardian provides a complete infrastructure for code review automation:
 
 - ✅ **Fully Implemented:**
-  - Plugin de Composer (instalación automática)
-  - Detección automática de frameworks
-  - Instalación de archivos de configuración
-  - Script de validación de dependencias
-  - Parsing y carga de configuración YAML
-  - Filtrado de archivos según patrones configurados
-  - Lectura de archivos de reglas (AGENTS.md)
+  - Composer plugin (automatic installation)
+  - Automatic framework detection
+  - Configuration file installation
+  - Dependency validation script
+  - YAML configuration parsing and loading
+  - File filtering according to configured patterns
+  - Rules file reading (AGENTS.md)
 
 - 🚧 **In Development:**
-  - Integración completa con APIs de AI (OpenAI, Anthropic, GitHub Copilot)
-  - Ejecución real de revisión de código usando modelos de AI
-  - Publicación automática de comentarios a PR/MR
-  - Detección automática de Git provider desde URL
+  - Full integration with AI APIs (OpenAI, Anthropic, GitHub Copilot)
+  - Actual code review execution using AI models
+  - Automatic comment posting to PR/MR
+  - Automatic Git provider detection from URL
 
-El script actualmente valida la configuración, filtra archivos correctamente y está preparado para la integración con APIs de AI. La funcionalidad completa de revisión está en desarrollo activo.
+The script currently validates configuration, filters files correctly, and is ready for AI API integration. Full review functionality is under active development.
 
 ## Usage
 

@@ -357,18 +357,118 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $vendorDir = $this->composer->getConfig()->get('vendor-dir');
         $projectDir = dirname((string) $vendorDir);
 
+        $io->write('<info>Removing Code Review Guardian files...</info>');
+
+        // Files to remove from project root
         $files = [
             'code-review-guardian.sh',
-            // Note: We don't remove the config file as it may contain user configuration
+            'code-review-guardian.yaml',
         ];
 
+        $removedCount = 0;
         foreach ($files as $file) {
             $path = $projectDir . '/' . $file;
 
             if (file_exists($path)) {
-                $io->write(sprintf('<info>Removing %s</info>', $file));
+                $io->write(sprintf('  <comment>-</comment> Removing <info>%s</info>', $file), false);
                 unlink($path);
+                $io->write(' <info>✓</info>');
+                $removedCount++;
             }
+        }
+
+        // Remove documentation files
+        $docsDir = $projectDir . '/docs';
+        $docFiles = [
+            'AGENTS.md',
+        ];
+
+        foreach ($docFiles as $file) {
+            $path = $docsDir . '/' . $file;
+
+            if (file_exists($path)) {
+                $io->write(sprintf('  <comment>-</comment> Removing <info>docs/%s</info>', $file), false);
+                unlink($path);
+                $io->write(' <info>✓</info>');
+                $removedCount++;
+            }
+        }
+
+        // Remove .gitignore entries
+        $io->write('<info>Cleaning up .gitignore...</info>');
+        $this->removeGitignoreEntries($projectDir, $io);
+
+        if ($removedCount > 0) {
+            $io->write(sprintf('<info>✓ Removed %d file(s) successfully</info>', $removedCount));
+        } else {
+            $io->write('<info>No files to remove (already cleaned up)</info>');
+        }
+    }
+
+    /**
+     * Remove Code Review Guardian entries from .gitignore.
+     *
+     * @param string      $projectDir The project root directory
+     * @param IOInterface $io         The IO interface
+     */
+    private function removeGitignoreEntries(string $projectDir, IOInterface $io): void
+    {
+        $gitignorePath = $projectDir . '/.gitignore';
+
+        if (!file_exists($gitignorePath)) {
+            return;
+        }
+
+        $content = file_get_contents($gitignorePath);
+        $lines = explode("\n", $content);
+
+        $entriesToRemove = [
+            'code-review-guardian.sh',
+            'code-review-guardian.yaml',
+        ];
+
+        $updated = false;
+        $newLines = [];
+        $skipSection = false;
+
+        foreach ($lines as $line) {
+            $trimmedLine = trim($line);
+
+            // Check if this is the Code Review Guardian section comment
+            if ($trimmedLine === '# Code Review Guardian') {
+                $skipSection = true;
+                continue;
+            }
+
+            // Check if we should skip this line (it's an entry to remove)
+            if ($skipSection && in_array($trimmedLine, $entriesToRemove, true)) {
+                $updated = true;
+                continue;
+            }
+
+            // If we encounter a non-empty line that's not in our entries, stop skipping
+            if ($skipSection && $trimmedLine !== '' && !in_array($trimmedLine, $entriesToRemove, true)) {
+                $skipSection = false;
+            }
+
+            // Also check for entries not in the section
+            if (!$skipSection && in_array($trimmedLine, $entriesToRemove, true)) {
+                $updated = true;
+                continue;
+            }
+
+            $newLines[] = $line;
+        }
+
+        // Remove trailing empty lines after the section if section was removed
+        while (!empty($newLines) && trim(end($newLines)) === '') {
+            array_pop($newLines);
+        }
+
+        if ($updated) {
+            $io->write('  <comment>-</comment> Removing entries from <info>.gitignore</info>', false);
+            file_put_contents($gitignorePath, implode("\n", $newLines) . "\n");
+            $io->write(' <info>✓</info>');
         }
     }
 }

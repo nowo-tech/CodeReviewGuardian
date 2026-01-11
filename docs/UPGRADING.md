@@ -22,6 +22,35 @@ This guide will help you upgrade Code Review Guardian to newer versions.
 
 ## Version-Specific Upgrade Notes
 
+### Upgrading to 0.0.7
+
+#### Script Architecture Changes
+
+Version 0.0.7 introduces a major architectural change to the script structure:
+
+**What Changed:**
+- The `code-review-guardian.sh` script in your project root is now minimal (~40 lines)
+- The script now acts as a lightweight wrapper that delegates to the actual implementation in `vendor/`
+- All logic is executed from `vendor/nowo-tech/code-review-guardian/bin/main.sh`
+- The script automatically detects the vendor directory location
+
+**What You Need to Do:**
+1. **No action required** - The script will be automatically updated on `composer update`
+2. The script will automatically detect and use the vendor directory
+3. All functionality remains the same - this is a transparent change
+
+**Benefits:**
+- Script in project root is minimal and always up-to-date
+- Code is maintained in vendor, not copied to your project
+- Easier to maintain and update
+- Better separation of concerns
+
+**Troubleshooting:**
+If you encounter issues after upgrading:
+- Ensure the package is properly installed: `composer install`
+- Verify vendor directory exists: `ls vendor/nowo-tech/code-review-guardian/bin/main.sh`
+- The script will show an error message if the vendor package is not found
+
 ### Upgrading to 0.0.5
 
 #### New Features
