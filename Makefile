@@ -28,7 +28,7 @@ up:
 	docker-compose build
 	docker-compose up -d
 	@echo "Installing dependencies..."
-	docker-compose exec php composer install --no-interaction
+	docker-compose run --rm php composer install --no-interaction
 	@echo "✅ Container ready!"
 
 # Stop container
@@ -37,31 +37,31 @@ down:
 
 # Open shell in container
 shell:
-	docker-compose exec php sh
+	docker-compose run --rm php sh
 
 # Install dependencies
 install:
-	docker-compose exec php composer install
+	docker-compose run --rm php composer install
 
 # Run tests
 test:
-	docker-compose exec php composer test
+	docker-compose run --rm php composer test
 
 # Run tests with coverage
 test-coverage:
-	docker-compose exec php composer test-coverage
+	docker-compose run --rm php composer test-coverage
 
 # Check code style
 cs-check:
-	docker-compose exec php composer cs-check
+	docker-compose run --rm php composer cs-check
 
 # Fix code style
 cs-fix:
-	docker-compose exec php composer cs-fix
+	docker-compose run --rm php composer cs-fix
 
 # Run all QA
 qa:
-	docker-compose exec php composer qa
+	docker-compose run --rm php composer qa
 
 # Clean vendor and cache
 clean:

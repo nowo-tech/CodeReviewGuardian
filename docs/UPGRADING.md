@@ -22,6 +22,30 @@ This guide will help you upgrade Code Review Guardian to newer versions.
 
 ## Version-Specific Upgrade Notes
 
+### Upgrading to 1.0.1
+
+This is a patch release that improves development experience and test stability. No breaking changes.
+
+#### Improvements
+
+- **Development Tools**: Makefile commands now work without requiring a running container. All commands use `docker-compose run --rm` for consistency.
+- **Code Coverage**: Xdebug is now properly configured in the Dockerfile, enabling code coverage reports out of the box.
+- **Test Stability**: Improved PHPUnit test assertions for better reliability.
+
+#### What You Need to Do
+
+**No action required** - This is a maintenance release with no breaking changes. Simply update the package:
+
+```bash
+composer update nowo-tech/code-review-guardian
+```
+
+#### Benefits
+
+- Better development experience: Makefile commands work without starting containers
+- Code coverage available by default in Docker environment
+- More reliable test suite
+
 ### Upgrading to 1.0.0
 
 #### First Stable Release

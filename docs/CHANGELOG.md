@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-01-11
+
+### Fixed
+- Fixed PHPUnit test failures by improving callback assertions to handle multiple message formats
+- Fixed test `testUpdateGitignoreDoesNotUpdateIfEntriesExist` to correctly handle framework detection messages
+- Fixed test `testUninstallRemovesGitignoreEntries` to accept all uninstall progress messages
+
+### Added
+- Xdebug configuration in Dockerfile for code coverage generation
+- Improved Makefile consistency: all commands now use `docker-compose run --rm` instead of `exec`
+
+### Changed
+- Improved test stability by using flexible callback assertions in PHPUnit tests
+- Makefile commands now work without requiring a running container (using `run --rm` instead of `exec`)
+
 ## [1.0.0] - 2026-01-11
 
 ### Added
