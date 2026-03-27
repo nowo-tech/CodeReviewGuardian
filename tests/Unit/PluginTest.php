@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace NowoTech\CodeReviewGuardian\Tests;
 
-use Composer\{Composer, Config};
+use Composer\Composer;
+use Composer\Config;
 use Composer\IO\IOInterface;
-use Composer\Script\{Event, ScriptEvents};
+use Composer\Script\Event;
+use Composer\Script\ScriptEvents;
 use NowoTech\CodeReviewGuardian\Plugin;
 use PHPUnit\Framework\TestCase;
 
@@ -56,16 +58,16 @@ final class PluginTest extends TestCase
 
     public function testUninstallRemovesFiles(): void
     {
-        $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
-        $vendorDir = $tempDir . '/vendor';
-        $docsDir = $tempDir . '/docs';
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        $docsDir = $tempDir.'/docs';
         mkdir($vendorDir, 0777, true);
         mkdir($docsDir, 0777, true);
 
         // Create test files
-        file_put_contents($tempDir . '/code-review-guardian.sh', '#!/bin/sh');
-        file_put_contents($tempDir . '/code-review-guardian.yaml', 'config: true');
-        file_put_contents($docsDir . '/AGENTS.md', '# Agents');
+        file_put_contents($tempDir.'/code-review-guardian.sh', '#!/bin/sh');
+        file_put_contents($tempDir.'/code-review-guardian.yaml', 'config: true');
+        file_put_contents($docsDir.'/AGENTS.md', '# Agents');
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -82,9 +84,9 @@ final class PluginTest extends TestCase
         $plugin->activate($composer, $io);
         $plugin->uninstall($composer, $io);
 
-        $this->assertFileDoesNotExist($tempDir . '/code-review-guardian.sh');
-        $this->assertFileDoesNotExist($tempDir . '/code-review-guardian.yaml');
-        $this->assertFileDoesNotExist($docsDir . '/AGENTS.md');
+        $this->assertFileDoesNotExist($tempDir.'/code-review-guardian.sh');
+        $this->assertFileDoesNotExist($tempDir.'/code-review-guardian.yaml');
+        $this->assertFileDoesNotExist($docsDir.'/AGENTS.md');
 
         // Cleanup
         @rmdir($docsDir);
@@ -94,12 +96,12 @@ final class PluginTest extends TestCase
 
     public function testOnPostInstallInstallsFiles(): void
     {
-        $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
-        $vendorDir = $tempDir . '/vendor';
-        $packageDir = $vendorDir . '/nowo-tech/code-review-guardian';
-        $binDir = $packageDir . '/bin';
-        $configSymfonyDir = $packageDir . '/config/symfony';
-        $configDir = $packageDir . '/config';
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
+        $binDir = $packageDir.'/bin';
+        $configSymfonyDir = $packageDir.'/config/symfony';
+        $configDir = $packageDir.'/config';
         mkdir($binDir, 0777, true);
         mkdir($configSymfonyDir, 0777, true);
         if (!is_dir($configDir)) {
@@ -111,17 +113,17 @@ final class PluginTest extends TestCase
             'name' => 'test/package',
             'require' => ['symfony/framework-bundle' => '^6.0'],
         ];
-        file_put_contents($tempDir . '/composer.json', json_encode($composerJson, JSON_PRETTY_PRINT));
+        file_put_contents($tempDir.'/composer.json', json_encode($composerJson, \JSON_PRETTY_PRINT));
 
         // Create source files
-        file_put_contents($binDir . '/code-review-guardian.sh', '#!/bin/sh\necho "test"');
-        file_put_contents($configSymfonyDir . '/code-review-guardian.yaml', 'framework: symfony');
-        file_put_contents($configSymfonyDir . '/AGENTS.md', '# AGENTS');
-        $docsSourceDir = $packageDir . '/docs';
+        file_put_contents($binDir.'/code-review-guardian.sh', '#!/bin/sh\necho "test"');
+        file_put_contents($configSymfonyDir.'/code-review-guardian.yaml', 'framework: symfony');
+        file_put_contents($configSymfonyDir.'/AGENTS.md', '# AGENTS');
+        $docsSourceDir = $packageDir.'/docs';
         if (!is_dir($docsSourceDir)) {
             mkdir($docsSourceDir, 0777, true);
         }
-        file_put_contents($docsSourceDir . '/GGA.md', '# GGA');
+        file_put_contents($docsSourceDir.'/GGA.md', '# GGA');
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -135,10 +137,10 @@ final class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $io->expects($this->atLeastOnce())
             ->method('write')
-            ->with($this->callback(function ($message) {
-                return strpos($message, 'Detected framework') !== false ||
-                       strpos($message, 'Installing') !== false ||
-                       strpos($message, 'Updated .gitignore') !== false;
+            ->with($this->callback(static function ($message) {
+                return str_contains($message, 'Detected framework')
+                       || str_contains($message, 'Installing')
+                       || str_contains($message, 'Updated .gitignore');
             }));
 
         $event = $this->createMock(Event::class);
@@ -149,10 +151,10 @@ final class PluginTest extends TestCase
         $plugin->activate($composer, $io);
         $plugin->onPostInstall($event);
 
-        $this->assertFileExists($tempDir . '/code-review-guardian.sh');
-        $this->assertFileExists($tempDir . '/code-review-guardian.yaml');
-        $this->assertFileExists($tempDir . '/docs/AGENTS.md');
-        $this->assertFileExists($tempDir . '/docs/GGA.md');
+        $this->assertFileExists($tempDir.'/code-review-guardian.sh');
+        $this->assertFileExists($tempDir.'/code-review-guardian.yaml');
+        $this->assertFileExists($tempDir.'/docs/AGENTS.md');
+        $this->assertFileExists($tempDir.'/docs/GGA.md');
 
         // Cleanup
         $this->removeDirectory($tempDir);
@@ -160,10 +162,10 @@ final class PluginTest extends TestCase
 
     public function testOnPostInstallInstallsLaravelConfig(): void
     {
-        $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
-        $vendorDir = $tempDir . '/vendor';
-        $packageDir = $vendorDir . '/nowo-tech/code-review-guardian';
-        $configLaravelDir = $packageDir . '/config/laravel';
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
+        $configLaravelDir = $packageDir.'/config/laravel';
         mkdir($configLaravelDir, 0777, true);
 
         // Create composer.json with Laravel framework
@@ -171,10 +173,10 @@ final class PluginTest extends TestCase
             'name' => 'test/package',
             'require' => ['laravel/framework' => '^10.0'],
         ];
-        file_put_contents($tempDir . '/composer.json', json_encode($composerJson, JSON_PRETTY_PRINT));
+        file_put_contents($tempDir.'/composer.json', json_encode($composerJson, \JSON_PRETTY_PRINT));
 
         // Create source file
-        file_put_contents($configLaravelDir . '/code-review-guardian.yaml', 'framework: laravel');
+        file_put_contents($configLaravelDir.'/code-review-guardian.yaml', 'framework: laravel');
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -188,12 +190,12 @@ final class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $io->expects($this->any())
             ->method('write')
-            ->with($this->callback(function ($message) {
-                return strpos($message, 'Detected framework') !== false ||
-                       strpos($message, 'LARAVEL') !== false ||
-                       strpos($message, 'Installing') !== false ||
-                       strpos($message, 'Updating') !== false ||
-                       strpos($message, 'Updated .gitignore') !== false;
+            ->with($this->callback(static function ($message) {
+                return str_contains($message, 'Detected framework')
+                       || str_contains($message, 'LARAVEL')
+                       || str_contains($message, 'Installing')
+                       || str_contains($message, 'Updating')
+                       || str_contains($message, 'Updated .gitignore');
             }))
             ->willReturnSelf();
 
@@ -205,8 +207,8 @@ final class PluginTest extends TestCase
         $plugin->activate($composer, $io);
         $plugin->onPostInstall($event);
 
-        $this->assertFileExists($tempDir . '/code-review-guardian.yaml');
-        $content = file_get_contents($tempDir . '/code-review-guardian.yaml');
+        $this->assertFileExists($tempDir.'/code-review-guardian.yaml');
+        $content = file_get_contents($tempDir.'/code-review-guardian.yaml');
         $this->assertStringContainsString('laravel', $content);
 
         // Cleanup
@@ -215,10 +217,10 @@ final class PluginTest extends TestCase
 
     public function testOnPostInstallInstallsGenericConfig(): void
     {
-        $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
-        $vendorDir = $tempDir . '/vendor';
-        $packageDir = $vendorDir . '/nowo-tech/code-review-guardian';
-        $configGenericDir = $packageDir . '/config/generic';
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
+        $configGenericDir = $packageDir.'/config/generic';
         mkdir($configGenericDir, 0777, true);
 
         // Create composer.json without framework
@@ -226,10 +228,10 @@ final class PluginTest extends TestCase
             'name' => 'test/package',
             'require' => ['some/package' => '^1.0'],
         ];
-        file_put_contents($tempDir . '/composer.json', json_encode($composerJson, JSON_PRETTY_PRINT));
+        file_put_contents($tempDir.'/composer.json', json_encode($composerJson, \JSON_PRETTY_PRINT));
 
         // Create source file
-        file_put_contents($configGenericDir . '/code-review-guardian.yaml', 'framework: generic');
+        file_put_contents($configGenericDir.'/code-review-guardian.yaml', 'framework: generic');
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -243,12 +245,12 @@ final class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $io->expects($this->any())
             ->method('write')
-            ->with($this->callback(function ($message) {
-                return strpos($message, 'Detected framework') !== false ||
-                       strpos($message, 'GENERIC') !== false ||
-                       strpos($message, 'Installing') !== false ||
-                       strpos($message, 'Updating') !== false ||
-                       strpos($message, 'Updated .gitignore') !== false;
+            ->with($this->callback(static function ($message) {
+                return str_contains($message, 'Detected framework')
+                       || str_contains($message, 'GENERIC')
+                       || str_contains($message, 'Installing')
+                       || str_contains($message, 'Updating')
+                       || str_contains($message, 'Updated .gitignore');
             }))
             ->willReturnSelf();
 
@@ -260,8 +262,8 @@ final class PluginTest extends TestCase
         $plugin->activate($composer, $io);
         $plugin->onPostInstall($event);
 
-        $this->assertFileExists($tempDir . '/code-review-guardian.yaml');
-        $content = file_get_contents($tempDir . '/code-review-guardian.yaml');
+        $this->assertFileExists($tempDir.'/code-review-guardian.yaml');
+        $content = file_get_contents($tempDir.'/code-review-guardian.yaml');
         $this->assertStringContainsString('generic', $content);
 
         // Cleanup
@@ -270,17 +272,17 @@ final class PluginTest extends TestCase
 
     public function testOnPostInstallUpdatesGitignore(): void
     {
-        $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
-        $vendorDir = $tempDir . '/vendor';
-        $packageDir = $vendorDir . '/nowo-tech/code-review-guardian';
-        $binDir = $packageDir . '/bin';
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
+        $binDir = $packageDir.'/bin';
         mkdir($binDir, 0777, true);
 
         // Create existing .gitignore
-        file_put_contents($tempDir . '/.gitignore', "vendor/\n");
+        file_put_contents($tempDir.'/.gitignore', "vendor/\n");
 
         // Create source files
-        file_put_contents($binDir . '/code-review-guardian.sh', '#!/bin/sh');
+        file_put_contents($binDir.'/code-review-guardian.sh', '#!/bin/sh');
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -301,7 +303,7 @@ final class PluginTest extends TestCase
         $plugin->activate($composer, $io);
         $plugin->onPostInstall($event);
 
-        $gitignoreContent = file_get_contents($tempDir . '/.gitignore');
+        $gitignoreContent = file_get_contents($tempDir.'/.gitignore');
         $this->assertStringContainsString('code-review-guardian.sh', $gitignoreContent);
         $this->assertStringContainsString('code-review-guardian.yaml', $gitignoreContent);
         $this->assertStringContainsString('# Code Review Guardian', $gitignoreContent);
@@ -312,28 +314,28 @@ final class PluginTest extends TestCase
 
     public function testOnPostInstallDoesNotOverwriteExistingConfig(): void
     {
-        $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
-        $vendorDir = $tempDir . '/vendor';
-        $packageDir = $vendorDir . '/nowo-tech/code-review-guardian';
-        $binDir = $packageDir . '/bin';
-        $configSymfonyDir = $packageDir . '/config/symfony';
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
+        $binDir = $packageDir.'/bin';
+        $configSymfonyDir = $packageDir.'/config/symfony';
         mkdir($binDir, 0777, true);
         mkdir($configSymfonyDir, 0777, true);
 
         // Create existing config file with user content
         $existingContent = 'framework: symfony\ncustom: user-config';
-        file_put_contents($tempDir . '/code-review-guardian.yaml', $existingContent);
+        file_put_contents($tempDir.'/code-review-guardian.yaml', $existingContent);
 
         // Create composer.json
         $composerJson = [
             'name' => 'test/package',
             'require' => ['symfony/framework-bundle' => '^6.0'],
         ];
-        file_put_contents($tempDir . '/composer.json', json_encode($composerJson, JSON_PRETTY_PRINT));
+        file_put_contents($tempDir.'/composer.json', json_encode($composerJson, \JSON_PRETTY_PRINT));
 
         // Create source files
-        file_put_contents($binDir . '/code-review-guardian.sh', '#!/bin/sh\necho "new script"');
-        file_put_contents($configSymfonyDir . '/code-review-guardian.yaml', 'framework: symfony\nnew: content');
+        file_put_contents($binDir.'/code-review-guardian.sh', '#!/bin/sh\necho "new script"');
+        file_put_contents($configSymfonyDir.'/code-review-guardian.yaml', 'framework: symfony\nnew: content');
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -355,12 +357,12 @@ final class PluginTest extends TestCase
         $plugin->onPostInstall($event);
 
         // Verify existing config content was preserved (not overwritten)
-        $content = file_get_contents($tempDir . '/code-review-guardian.yaml');
+        $content = file_get_contents($tempDir.'/code-review-guardian.yaml');
         $this->assertEquals($existingContent, $content);
 
         // Verify script was updated (always updated, even if exists)
-        $this->assertFileExists($tempDir . '/code-review-guardian.sh');
-        $scriptContent = file_get_contents($tempDir . '/code-review-guardian.sh');
+        $this->assertFileExists($tempDir.'/code-review-guardian.sh');
+        $scriptContent = file_get_contents($tempDir.'/code-review-guardian.sh');
         $this->assertStringContainsString('new script', $scriptContent);
 
         // Cleanup
@@ -369,29 +371,29 @@ final class PluginTest extends TestCase
 
     public function testOnPostUpdateUpdatesScriptAndGitignore(): void
     {
-        $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
-        $vendorDir = $tempDir . '/vendor';
-        $packageDir = $vendorDir . '/nowo-tech/code-review-guardian';
-        $binDir = $packageDir . '/bin';
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
+        $binDir = $packageDir.'/bin';
         mkdir($binDir, 0777, true);
 
         // Create existing .gitignore without Code Review Guardian entries
-        file_put_contents($tempDir . '/.gitignore', "vendor/\n");
+        file_put_contents($tempDir.'/.gitignore', "vendor/\n");
 
         // Create composer.json for framework detection
         $composerJson = [
             'name' => 'test/package',
             'require' => ['symfony/framework-bundle' => '^6.0'],
         ];
-        file_put_contents($tempDir . '/composer.json', json_encode($composerJson, JSON_PRETTY_PRINT));
+        file_put_contents($tempDir.'/composer.json', json_encode($composerJson, \JSON_PRETTY_PRINT));
 
         // Create source script with new content
         $newScriptContent = '#!/bin/sh\necho "updated script"';
-        file_put_contents($binDir . '/code-review-guardian.sh', $newScriptContent);
+        file_put_contents($binDir.'/code-review-guardian.sh', $newScriptContent);
 
         // Create existing script with old content
         $oldScriptContent = '#!/bin/sh\necho "old script"';
-        file_put_contents($tempDir . '/code-review-guardian.sh', $oldScriptContent);
+        file_put_contents($tempDir.'/code-review-guardian.sh', $oldScriptContent);
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -405,10 +407,10 @@ final class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $io->expects($this->atLeastOnce())
             ->method('write')
-            ->with($this->callback(function ($message) {
-                return strpos($message, 'Updated .gitignore') !== false ||
-                       strpos($message, 'Updating code-review-guardian.sh') !== false ||
-                       strpos($message, 'Detected framework') !== false;
+            ->with($this->callback(static function ($message) {
+                return str_contains($message, 'Updated .gitignore')
+                       || str_contains($message, 'Updating code-review-guardian.sh')
+                       || str_contains($message, 'Detected framework');
             }));
 
         $event = $this->createMock(Event::class);
@@ -420,12 +422,12 @@ final class PluginTest extends TestCase
         $plugin->onPostUpdate($event);
 
         // Verify script was updated
-        $this->assertFileExists($tempDir . '/code-review-guardian.sh');
-        $updatedScriptContent = file_get_contents($tempDir . '/code-review-guardian.sh');
+        $this->assertFileExists($tempDir.'/code-review-guardian.sh');
+        $updatedScriptContent = file_get_contents($tempDir.'/code-review-guardian.sh');
         $this->assertEquals($newScriptContent, $updatedScriptContent);
 
         // Verify .gitignore was updated
-        $gitignoreContent = file_get_contents($tempDir . '/.gitignore');
+        $gitignoreContent = file_get_contents($tempDir.'/.gitignore');
         $this->assertStringContainsString('code-review-guardian.sh', $gitignoreContent);
         $this->assertStringContainsString('code-review-guardian.yaml', $gitignoreContent);
 
@@ -435,10 +437,10 @@ final class PluginTest extends TestCase
 
     public function testOnPostInstallWithSourceFileNotFound(): void
     {
-        $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
-        $vendorDir = $tempDir . '/vendor';
-        $packageDir = $vendorDir . '/nowo-tech/code-review-guardian';
-        $binDir = $packageDir . '/bin';
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
+        $binDir = $packageDir.'/bin';
         mkdir($binDir, 0777, true);
 
         // Don't create source file - should handle missing file gracefully
@@ -446,7 +448,7 @@ final class PluginTest extends TestCase
             'name' => 'test/package',
             'require' => ['symfony/framework-bundle' => '^6.0'],
         ];
-        file_put_contents($tempDir . '/composer.json', json_encode($composerJson, JSON_PRETTY_PRINT));
+        file_put_contents($tempDir.'/composer.json', json_encode($composerJson, \JSON_PRETTY_PRINT));
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -479,10 +481,10 @@ final class PluginTest extends TestCase
 
     public function testOnPostInstallWithConfigDirectoryNotFound(): void
     {
-        $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
-        $vendorDir = $tempDir . '/vendor';
-        $packageDir = $vendorDir . '/nowo-tech/code-review-guardian';
-        $binDir = $packageDir . '/bin';
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
+        $binDir = $packageDir.'/bin';
         mkdir($binDir, 0777, true);
 
         // Don't create config directory - should handle missing directory gracefully
@@ -490,9 +492,9 @@ final class PluginTest extends TestCase
             'name' => 'test/package',
             'require' => ['symfony/framework-bundle' => '^6.0'],
         ];
-        file_put_contents($tempDir . '/composer.json', json_encode($composerJson, JSON_PRETTY_PRINT));
+        file_put_contents($tempDir.'/composer.json', json_encode($composerJson, \JSON_PRETTY_PRINT));
 
-        file_put_contents($binDir . '/code-review-guardian.sh', '#!/bin/sh');
+        file_put_contents($binDir.'/code-review-guardian.sh', '#!/bin/sh');
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -522,11 +524,11 @@ final class PluginTest extends TestCase
 
     public function testOnPostInstallWithDocumentationFilesMissing(): void
     {
-        $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
-        $vendorDir = $tempDir . '/vendor';
-        $packageDir = $vendorDir . '/nowo-tech/code-review-guardian';
-        $binDir = $packageDir . '/bin';
-        $configSymfonyDir = $packageDir . '/config/symfony';
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
+        $binDir = $packageDir.'/bin';
+        $configSymfonyDir = $packageDir.'/config/symfony';
         mkdir($binDir, 0777, true);
         mkdir($configSymfonyDir, 0777, true);
 
@@ -535,10 +537,10 @@ final class PluginTest extends TestCase
             'name' => 'test/package',
             'require' => ['symfony/framework-bundle' => '^6.0'],
         ];
-        file_put_contents($tempDir . '/composer.json', json_encode($composerJson, JSON_PRETTY_PRINT));
+        file_put_contents($tempDir.'/composer.json', json_encode($composerJson, \JSON_PRETTY_PRINT));
 
-        file_put_contents($binDir . '/code-review-guardian.sh', '#!/bin/sh');
-        file_put_contents($configSymfonyDir . '/code-review-guardian.yaml', 'framework: symfony');
+        file_put_contents($binDir.'/code-review-guardian.sh', '#!/bin/sh');
+        file_put_contents($configSymfonyDir.'/code-review-guardian.yaml', 'framework: symfony');
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -560,8 +562,8 @@ final class PluginTest extends TestCase
         $plugin->onPostInstall($event);
 
         // Documentation files should not exist (source files don't exist)
-        $this->assertFileDoesNotExist($tempDir . '/docs/AGENTS.md');
-        $this->assertFileDoesNotExist($tempDir . '/docs/GGA.md');
+        $this->assertFileDoesNotExist($tempDir.'/docs/AGENTS.md');
+        $this->assertFileDoesNotExist($tempDir.'/docs/GGA.md');
 
         // Cleanup
         $this->removeDirectory($tempDir);
@@ -569,12 +571,12 @@ final class PluginTest extends TestCase
 
     public function testOnPostInstallWithForceUpdateUpdatesExistingFiles(): void
     {
-        $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
-        $vendorDir = $tempDir . '/vendor';
-        $packageDir = $vendorDir . '/nowo-tech/code-review-guardian';
-        $binDir = $packageDir . '/bin';
-        $configSymfonyDir = $packageDir . '/config/symfony';
-        $configDir = $packageDir . '/config';
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
+        $binDir = $packageDir.'/bin';
+        $configSymfonyDir = $packageDir.'/config/symfony';
+        $configDir = $packageDir.'/config';
         mkdir($binDir, 0777, true);
         mkdir($configSymfonyDir, 0777, true);
         if (!is_dir($configDir)) {
@@ -585,31 +587,31 @@ final class PluginTest extends TestCase
             'name' => 'test/package',
             'require' => ['symfony/framework-bundle' => '^6.0'],
         ];
-        file_put_contents($tempDir . '/composer.json', json_encode($composerJson, JSON_PRETTY_PRINT));
+        file_put_contents($tempDir.'/composer.json', json_encode($composerJson, \JSON_PRETTY_PRINT));
 
         // Create source files
         $newScriptContent = '#!/bin/sh\necho "new script"';
-        file_put_contents($binDir . '/code-review-guardian.sh', $newScriptContent);
+        file_put_contents($binDir.'/code-review-guardian.sh', $newScriptContent);
 
         $newConfigContent = 'framework: symfony\nnew: config';
-        file_put_contents($configSymfonyDir . '/code-review-guardian.yaml', $newConfigContent);
+        file_put_contents($configSymfonyDir.'/code-review-guardian.yaml', $newConfigContent);
 
         $newAgentContent = '# New AGENTS';
-        file_put_contents($configSymfonyDir . '/AGENTS.md', $newAgentContent);
+        file_put_contents($configSymfonyDir.'/AGENTS.md', $newAgentContent);
 
         $newGgaContent = '# New GGA';
-        file_put_contents($packageDir . '/docs/GGA.md', $newGgaContent);
+        file_put_contents($packageDir.'/docs/GGA.md', $newGgaContent);
 
         // Create existing files with old content
         $oldScriptContent = '#!/bin/sh\necho "old script"';
-        file_put_contents($tempDir . '/code-review-guardian.sh', $oldScriptContent);
+        file_put_contents($tempDir.'/code-review-guardian.sh', $oldScriptContent);
 
         $oldConfigContent = 'framework: symfony\nold: config';
-        file_put_contents($tempDir . '/code-review-guardian.yaml', $oldConfigContent);
+        file_put_contents($tempDir.'/code-review-guardian.yaml', $oldConfigContent);
 
-        mkdir($tempDir . '/docs', 0777, true);
-        file_put_contents($tempDir . '/docs/AGENTS.md', '# Old AGENTS');
-        file_put_contents($tempDir . '/docs/GGA.md', '# Old GGA');
+        mkdir($tempDir.'/docs', 0777, true);
+        file_put_contents($tempDir.'/docs/AGENTS.md', '# Old AGENTS');
+        file_put_contents($tempDir.'/docs/GGA.md', '# Old GGA');
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -623,10 +625,10 @@ final class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $io->expects($this->atLeastOnce())
             ->method('write')
-            ->with($this->callback(function ($message) {
-                return strpos($message, 'Updating') !== false ||
-                       strpos($message, 'Detected framework') !== false ||
-                       strpos($message, 'Updated .gitignore') !== false;
+            ->with($this->callback(static function ($message) {
+                return str_contains($message, 'Updating')
+                       || str_contains($message, 'Detected framework')
+                       || str_contains($message, 'Updated .gitignore');
             }));
 
         $event = $this->createMock(Event::class);
@@ -643,10 +645,10 @@ final class PluginTest extends TestCase
         $method->invoke($plugin, $io, true);
 
         // Verify files were updated
-        $this->assertFileExists($tempDir . '/code-review-guardian.sh');
-        $this->assertFileExists($tempDir . '/code-review-guardian.yaml');
-        $this->assertFileExists($tempDir . '/docs/AGENTS.md');
-        $this->assertFileExists($tempDir . '/docs/GGA.md');
+        $this->assertFileExists($tempDir.'/code-review-guardian.sh');
+        $this->assertFileExists($tempDir.'/code-review-guardian.yaml');
+        $this->assertFileExists($tempDir.'/docs/AGENTS.md');
+        $this->assertFileExists($tempDir.'/docs/GGA.md');
 
         // Note: We can't easily verify content was updated without reading files,
         // but the method should have been called with forceUpdate=true
@@ -657,8 +659,8 @@ final class PluginTest extends TestCase
 
     public function testUpdateGitignoreCreatesNewFile(): void
     {
-        $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
-        $vendorDir = $tempDir . '/vendor';
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
         mkdir($vendorDir, 0777, true);
 
         // Don't create .gitignore - should create new one
@@ -674,11 +676,11 @@ final class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $io->expects($this->any())
             ->method('write')
-            ->with($this->callback(function ($message) {
-                return strpos($message, 'Detected framework') !== false ||
-                       strpos($message, 'Updated .gitignore') !== false ||
-                       strpos($message, 'Installing') !== false ||
-                       strpos($message, 'Updating') !== false;
+            ->with($this->callback(static function ($message) {
+                return str_contains($message, 'Detected framework')
+                       || str_contains($message, 'Updated .gitignore')
+                       || str_contains($message, 'Installing')
+                       || str_contains($message, 'Updating');
             }))
             ->willReturnSelf();
 
@@ -690,25 +692,25 @@ final class PluginTest extends TestCase
         $plugin->activate($composer, $io);
         $plugin->onPostUpdate($event);
 
-        $this->assertFileExists($tempDir . '/.gitignore');
-        $gitignoreContent = file_get_contents($tempDir . '/.gitignore');
+        $this->assertFileExists($tempDir.'/.gitignore');
+        $gitignoreContent = file_get_contents($tempDir.'/.gitignore');
         $this->assertStringContainsString('code-review-guardian.sh', $gitignoreContent);
         $this->assertStringContainsString('code-review-guardian.yaml', $gitignoreContent);
 
         // Cleanup
-        @unlink($tempDir . '/.gitignore');
+        @unlink($tempDir.'/.gitignore');
         @rmdir($vendorDir);
         @rmdir($tempDir);
     }
 
     public function testUpdateGitignoreWithEmptyFile(): void
     {
-        $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
-        $vendorDir = $tempDir . '/vendor';
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
         mkdir($vendorDir, 0777, true);
 
         // Create empty .gitignore
-        file_put_contents($tempDir . '/.gitignore', '');
+        file_put_contents($tempDir.'/.gitignore', '');
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -722,11 +724,11 @@ final class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $io->expects($this->any())
             ->method('write')
-            ->with($this->callback(function ($message) {
-                return strpos($message, 'Detected framework') !== false ||
-                       strpos($message, 'Updated .gitignore') !== false ||
-                       strpos($message, 'Installing') !== false ||
-                       strpos($message, 'Updating') !== false;
+            ->with($this->callback(static function ($message) {
+                return str_contains($message, 'Detected framework')
+                       || str_contains($message, 'Updated .gitignore')
+                       || str_contains($message, 'Installing')
+                       || str_contains($message, 'Updating');
             }))
             ->willReturnSelf();
 
@@ -738,24 +740,24 @@ final class PluginTest extends TestCase
         $plugin->activate($composer, $io);
         $plugin->onPostUpdate($event);
 
-        $gitignoreContent = file_get_contents($tempDir . '/.gitignore');
+        $gitignoreContent = file_get_contents($tempDir.'/.gitignore');
         $this->assertStringContainsString('code-review-guardian.sh', $gitignoreContent);
         $this->assertStringContainsString('code-review-guardian.yaml', $gitignoreContent);
 
         // Cleanup
-        @unlink($tempDir . '/.gitignore');
+        @unlink($tempDir.'/.gitignore');
         @rmdir($vendorDir);
         @rmdir($tempDir);
     }
 
     public function testUpdateGitignoreWithFileWithoutNewline(): void
     {
-        $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
-        $vendorDir = $tempDir . '/vendor';
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
         mkdir($vendorDir, 0777, true);
 
         // Create .gitignore without trailing newline
-        file_put_contents($tempDir . '/.gitignore', 'vendor/');
+        file_put_contents($tempDir.'/.gitignore', 'vendor/');
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -769,11 +771,11 @@ final class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $io->expects($this->any())
             ->method('write')
-            ->with($this->callback(function ($message) {
-                return strpos($message, 'Detected framework') !== false ||
-                       strpos($message, 'Updated .gitignore') !== false ||
-                       strpos($message, 'Installing') !== false ||
-                       strpos($message, 'Updating') !== false;
+            ->with($this->callback(static function ($message) {
+                return str_contains($message, 'Detected framework')
+                       || str_contains($message, 'Updated .gitignore')
+                       || str_contains($message, 'Installing')
+                       || str_contains($message, 'Updating');
             }))
             ->willReturnSelf();
 
@@ -785,25 +787,25 @@ final class PluginTest extends TestCase
         $plugin->activate($composer, $io);
         $plugin->onPostUpdate($event);
 
-        $gitignoreContent = file_get_contents($tempDir . '/.gitignore');
+        $gitignoreContent = file_get_contents($tempDir.'/.gitignore');
         $this->assertStringContainsString('vendor/', $gitignoreContent);
         $this->assertStringContainsString('code-review-guardian.sh', $gitignoreContent);
 
         // Cleanup
-        @unlink($tempDir . '/.gitignore');
+        @unlink($tempDir.'/.gitignore');
         @rmdir($vendorDir);
         @rmdir($tempDir);
     }
 
     public function testUpdateGitignoreDoesNotUpdateIfEntriesExist(): void
     {
-        $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
-        $vendorDir = $tempDir . '/vendor';
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
         mkdir($vendorDir, 0777, true);
 
         // Create .gitignore with entries already present
         $gitignoreContent = "# Code Review Guardian\ncode-review-guardian.sh\ncode-review-guardian.yaml\n";
-        file_put_contents($tempDir . '/.gitignore', $gitignoreContent);
+        file_put_contents($tempDir.'/.gitignore', $gitignoreContent);
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -818,15 +820,15 @@ final class PluginTest extends TestCase
         // Framework detection message is always shown, but .gitignore update message should not appear
         $io->expects($this->any())
             ->method('write')
-            ->with($this->callback(function ($message) {
+            ->with($this->callback(static function ($message) {
                 // Allow framework detection and script installation messages
-                if (strpos($message, 'Detected framework') !== false ||
-                    strpos($message, 'Installing') !== false ||
-                    strpos($message, 'Updating') !== false) {
+                if (str_contains($message, 'Detected framework')
+                    || str_contains($message, 'Installing')
+                    || str_contains($message, 'Updating')) {
                     return true;
                 }
                 // Reject .gitignore update messages
-                if (strpos($message, 'Updated .gitignore') !== false) {
+                if (str_contains($message, 'Updated .gitignore')) {
                     return false;
                 }
 
@@ -844,23 +846,23 @@ final class PluginTest extends TestCase
         $plugin->onPostUpdate($event);
 
         // Content should remain the same
-        $finalContent = file_get_contents($tempDir . '/.gitignore');
+        $finalContent = file_get_contents($tempDir.'/.gitignore');
         $this->assertEquals($gitignoreContent, $finalContent);
 
         // Cleanup
-        @unlink($tempDir . '/.gitignore');
+        @unlink($tempDir.'/.gitignore');
         @rmdir($vendorDir);
         @rmdir($tempDir);
     }
 
     public function testUpdateGitignoreWithPartialEntries(): void
     {
-        $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
-        $vendorDir = $tempDir . '/vendor';
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
         mkdir($vendorDir, 0777, true);
 
         // Create .gitignore with only one entry present
-        file_put_contents($tempDir . '/.gitignore', "vendor/\ncode-review-guardian.sh\n");
+        file_put_contents($tempDir.'/.gitignore', "vendor/\ncode-review-guardian.sh\n");
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -874,11 +876,11 @@ final class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $io->expects($this->any())
             ->method('write')
-            ->with($this->callback(function ($message) {
-                return strpos($message, 'Detected framework') !== false ||
-                       strpos($message, 'Updated .gitignore') !== false ||
-                       strpos($message, 'Installing') !== false ||
-                       strpos($message, 'Updating') !== false;
+            ->with($this->callback(static function ($message) {
+                return str_contains($message, 'Detected framework')
+                       || str_contains($message, 'Updated .gitignore')
+                       || str_contains($message, 'Installing')
+                       || str_contains($message, 'Updating');
             }))
             ->willReturnSelf();
 
@@ -890,20 +892,20 @@ final class PluginTest extends TestCase
         $plugin->activate($composer, $io);
         $plugin->onPostUpdate($event);
 
-        $gitignoreContent = file_get_contents($tempDir . '/.gitignore');
+        $gitignoreContent = file_get_contents($tempDir.'/.gitignore');
         $this->assertStringContainsString('code-review-guardian.sh', $gitignoreContent);
         $this->assertStringContainsString('code-review-guardian.yaml', $gitignoreContent);
 
         // Cleanup
-        @unlink($tempDir . '/.gitignore');
+        @unlink($tempDir.'/.gitignore');
         @rmdir($vendorDir);
         @rmdir($tempDir);
     }
 
     public function testUninstallDoesNotRemoveNonExistentFile(): void
     {
-        $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
-        $vendorDir = $tempDir . '/vendor';
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
         mkdir($vendorDir, 0777, true);
 
         // Don't create the files - should handle gracefully
@@ -923,8 +925,8 @@ final class PluginTest extends TestCase
         $plugin->uninstall($composer, $io);
 
         // Verify that non-existent files were not removed (no errors thrown)
-        $this->assertFileDoesNotExist($tempDir . '/code-review-guardian.sh');
-        $this->assertFileDoesNotExist($tempDir . '/code-review-guardian.yaml');
+        $this->assertFileDoesNotExist($tempDir.'/code-review-guardian.sh');
+        $this->assertFileDoesNotExist($tempDir.'/code-review-guardian.yaml');
 
         // Cleanup
         @rmdir($vendorDir);
@@ -933,8 +935,8 @@ final class PluginTest extends TestCase
 
     public function testUninstallRemovesGitignoreEntries(): void
     {
-        $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
-        $vendorDir = $tempDir . '/vendor';
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
         mkdir($vendorDir, 0777, true);
 
         // Create .gitignore with Code Review Guardian entries
@@ -948,7 +950,7 @@ final class PluginTest extends TestCase
         $gitignoreContent .= "# Other entries\n";
         $gitignoreContent .= ".env.local\n";
 
-        file_put_contents($tempDir . '/.gitignore', $gitignoreContent);
+        file_put_contents($tempDir.'/.gitignore', $gitignoreContent);
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -962,15 +964,15 @@ final class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $io->expects($this->any())
             ->method('write')
-            ->with($this->callback(function ($message) {
-                return strpos($message, 'Removing Code Review Guardian files') !== false ||
-                       strpos($message, 'Removed Code Review Guardian entries from .gitignore') !== false ||
-                       strpos($message, 'Removing entries from') !== false ||
-                       strpos($message, 'Cleaning up .gitignore') !== false ||
-                       strpos($message, 'Removed') !== false ||
-                       strpos($message, 'No files to remove') !== false ||
-                       strpos($message, '✓') !== false ||
-                       strpos($message, '<info>✓</info>') !== false;
+            ->with($this->callback(static function ($message) {
+                return str_contains($message, 'Removing Code Review Guardian files')
+                       || str_contains($message, 'Removed Code Review Guardian entries from .gitignore')
+                       || str_contains($message, 'Removing entries from')
+                       || str_contains($message, 'Cleaning up .gitignore')
+                       || str_contains($message, 'Removed')
+                       || str_contains($message, 'No files to remove')
+                       || str_contains($message, '✓')
+                       || str_contains($message, '<info>✓</info>');
             }))
             ->willReturnSelf();
 
@@ -978,7 +980,7 @@ final class PluginTest extends TestCase
         $plugin->activate($composer, $io);
         $plugin->uninstall($composer, $io);
 
-        $remainingContent = file_get_contents($tempDir . '/.gitignore');
+        $remainingContent = file_get_contents($tempDir.'/.gitignore');
         $this->assertStringNotContainsString('code-review-guardian.sh', $remainingContent);
         $this->assertStringNotContainsString('code-review-guardian.yaml', $remainingContent);
         $this->assertStringNotContainsString('# Code Review Guardian', $remainingContent);
@@ -986,17 +988,17 @@ final class PluginTest extends TestCase
         $this->assertStringContainsString('.env.local', $remainingContent);
 
         // Cleanup
-        @unlink($tempDir . '/.gitignore');
+        @unlink($tempDir.'/.gitignore');
         @rmdir($vendorDir);
         @rmdir($tempDir);
     }
 
     public function testScriptAlwaysUpdatesEvenIfExists(): void
     {
-        $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
-        $vendorDir = $tempDir . '/vendor';
-        $packageDir = $vendorDir . '/nowo-tech/code-review-guardian';
-        $binDir = $packageDir . '/bin';
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
+        $binDir = $packageDir.'/bin';
         mkdir($binDir, 0777, true);
 
         // Create composer.json for framework detection
@@ -1004,15 +1006,15 @@ final class PluginTest extends TestCase
             'name' => 'test/package',
             'require' => ['symfony/framework-bundle' => '^6.0'],
         ];
-        file_put_contents($tempDir . '/composer.json', json_encode($composerJson, JSON_PRETTY_PRINT));
+        file_put_contents($tempDir.'/composer.json', json_encode($composerJson, \JSON_PRETTY_PRINT));
 
         // Create source script with new version
         $newScriptContent = '#!/bin/sh\necho "version 2.0"';
-        file_put_contents($binDir . '/code-review-guardian.sh', $newScriptContent);
+        file_put_contents($binDir.'/code-review-guardian.sh', $newScriptContent);
 
         // Create existing script with old version
         $oldScriptContent = '#!/bin/sh\necho "version 1.0"';
-        file_put_contents($tempDir . '/code-review-guardian.sh', $oldScriptContent);
+        file_put_contents($tempDir.'/code-review-guardian.sh', $oldScriptContent);
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -1026,11 +1028,11 @@ final class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $io->expects($this->atLeastOnce())
             ->method('write')
-            ->with($this->callback(function ($message) {
-                return strpos($message, 'Updating code-review-guardian.sh') !== false ||
-                       strpos($message, 'Installing code-review-guardian.sh') !== false ||
-                       strpos($message, 'Detected framework') !== false ||
-                       strpos($message, 'Updated .gitignore') !== false;
+            ->with($this->callback(static function ($message) {
+                return str_contains($message, 'Updating code-review-guardian.sh')
+                       || str_contains($message, 'Installing code-review-guardian.sh')
+                       || str_contains($message, 'Detected framework')
+                       || str_contains($message, 'Updated .gitignore');
             }));
 
         $event = $this->createMock(Event::class);
@@ -1044,19 +1046,19 @@ final class PluginTest extends TestCase
         $plugin->onPostInstall($event);
 
         // Verify script was updated with new version
-        $this->assertFileExists($tempDir . '/code-review-guardian.sh');
-        $updatedContent = file_get_contents($tempDir . '/code-review-guardian.sh');
+        $this->assertFileExists($tempDir.'/code-review-guardian.sh');
+        $updatedContent = file_get_contents($tempDir.'/code-review-guardian.sh');
         $this->assertEquals($newScriptContent, $updatedContent);
 
         // Update source script again to simulate a package update
         $evenNewerScriptContent = '#!/bin/sh\necho "version 3.0"';
-        file_put_contents($binDir . '/code-review-guardian.sh', $evenNewerScriptContent);
+        file_put_contents($binDir.'/code-review-guardian.sh', $evenNewerScriptContent);
 
         // Test that onPostUpdate also updates the script
         $plugin->onPostUpdate($event);
 
         // Verify script was updated again
-        $updatedContent2 = file_get_contents($tempDir . '/code-review-guardian.sh');
+        $updatedContent2 = file_get_contents($tempDir.'/code-review-guardian.sh');
         $this->assertEquals($evenNewerScriptContent, $updatedContent2);
 
         // Cleanup
@@ -1065,12 +1067,12 @@ final class PluginTest extends TestCase
 
     public function testOnPostInstallInstallsDocumentationFilesWithForceUpdate(): void
     {
-        $tempDir = sys_get_temp_dir() . '/code-review-guardian-plugin-test-' . uniqid();
-        $vendorDir = $tempDir . '/vendor';
-        $packageDir = $vendorDir . '/nowo-tech/code-review-guardian';
-        $binDir = $packageDir . '/bin';
-        $configSymfonyDir = $packageDir . '/config/symfony';
-        $docsSourceDir = $packageDir . '/docs';
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
+        $binDir = $packageDir.'/bin';
+        $configSymfonyDir = $packageDir.'/config/symfony';
+        $docsSourceDir = $packageDir.'/docs';
         mkdir($binDir, 0777, true);
         mkdir($configSymfonyDir, 0777, true);
         mkdir($docsSourceDir, 0777, true);
@@ -1079,17 +1081,17 @@ final class PluginTest extends TestCase
             'name' => 'test/package',
             'require' => ['symfony/framework-bundle' => '^6.0'],
         ];
-        file_put_contents($tempDir . '/composer.json', json_encode($composerJson, JSON_PRETTY_PRINT));
+        file_put_contents($tempDir.'/composer.json', json_encode($composerJson, \JSON_PRETTY_PRINT));
 
-        file_put_contents($binDir . '/code-review-guardian.sh', '#!/bin/sh');
-        file_put_contents($configSymfonyDir . '/code-review-guardian.yaml', 'framework: symfony');
-        file_put_contents($configSymfonyDir . '/AGENTS.md', '# New AGENTS');
-        file_put_contents($docsSourceDir . '/GGA.md', '# New GGA');
+        file_put_contents($binDir.'/code-review-guardian.sh', '#!/bin/sh');
+        file_put_contents($configSymfonyDir.'/code-review-guardian.yaml', 'framework: symfony');
+        file_put_contents($configSymfonyDir.'/AGENTS.md', '# New AGENTS');
+        file_put_contents($docsSourceDir.'/GGA.md', '# New GGA');
 
         // Create existing documentation files
-        mkdir($tempDir . '/docs', 0777, true);
-        file_put_contents($tempDir . '/docs/AGENTS.md', '# Old AGENTS');
-        file_put_contents($tempDir . '/docs/GGA.md', '# Old GGA');
+        mkdir($tempDir.'/docs', 0777, true);
+        file_put_contents($tempDir.'/docs/AGENTS.md', '# Old AGENTS');
+        file_put_contents($tempDir.'/docs/GGA.md', '# Old GGA');
 
         $config = $this->createMock(Config::class);
         $config->method('get')
@@ -1103,11 +1105,11 @@ final class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $io->expects($this->atLeastOnce())
             ->method('write')
-            ->with($this->callback(function ($message) {
-                return strpos($message, 'Updating') !== false ||
-                       strpos($message, 'Installing') !== false ||
-                       strpos($message, 'Detected framework') !== false ||
-                       strpos($message, 'Updated .gitignore') !== false;
+            ->with($this->callback(static function ($message) {
+                return str_contains($message, 'Updating')
+                       || str_contains($message, 'Installing')
+                       || str_contains($message, 'Detected framework')
+                       || str_contains($message, 'Updated .gitignore');
             }));
 
         $event = $this->createMock(Event::class);
@@ -1123,8 +1125,8 @@ final class PluginTest extends TestCase
         $method->setAccessible(true);
         $method->invoke($plugin, $io, true);
 
-        $this->assertFileExists($tempDir . '/docs/AGENTS.md');
-        $this->assertFileExists($tempDir . '/docs/GGA.md');
+        $this->assertFileExists($tempDir.'/docs/AGENTS.md');
+        $this->assertFileExists($tempDir.'/docs/GGA.md');
 
         // Cleanup
         $this->removeDirectory($tempDir);
@@ -1143,7 +1145,7 @@ final class PluginTest extends TestCase
 
         $files = array_diff(scandir($dir), ['.', '..']);
         foreach ($files as $file) {
-            $path = $dir . '/' . $file;
+            $path = $dir.'/'.$file;
             if (is_dir($path)) {
                 $this->removeDirectory($path);
             } else {

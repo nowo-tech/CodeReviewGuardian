@@ -8,12 +8,13 @@ use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
-use Composer\Script\{Event, ScriptEvents};
+use Composer\Script\Event;
+use Composer\Script\ScriptEvents;
 
 /**
  * Composer plugin that installs code review guardian configuration files.
  * Works with any PHP project (Symfony, Laravel, Yii, CodeIgniter, etc.)
- * and any Git provider (GitHub, GitLab, Bitbucket, etc.)
+ * and any Git provider (GitHub, GitLab, Bitbucket, etc.).
  *
  * @author Héctor Franco Aceituno <hectorfranco@nowo.tech>
  *
@@ -24,9 +25,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     /** @var Composer The Composer instance */
     private Composer $composer;
 
-    /** @var IOInterface The IO interface */
-    private IOInterface $io;
-
     /**
      * Get the octal permission mode compatible with the current PHP version.
      *
@@ -34,7 +32,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     private function getChmodMode(): int
     {
-        return octdec('755');
+        return (int) octdec('755');
     }
 
     /**
@@ -46,7 +44,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     public function activate(Composer $composer, IOInterface $io): void
     {
         $this->composer = $composer;
-        $this->io = $io;
     }
 
     /**
@@ -106,7 +103,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     }
 
     /**
-     * Install files to the project root.
+     * Install or update Code Review Guardian assets in the consuming project.
+     * - `code-review-guardian.sh` is always copied from the package (latest wrapper on every install/update).
+     * - `code-review-guardian.yaml` is copied only if missing (unless $forceUpdate).
+     * - `docs/AGENTS.md` and `docs/GGA.md` are installed under docs/ only if missing (unless $forceUpdate).
+     * - `.gitignore` is updated to list the root script and YAML (not the docs files).
      *
      * @param IOInterface $io          The IO interface
      * @param bool        $forceUpdate Force update even if files exist
@@ -114,20 +115,20 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     private function installFiles(IOInterface $io, bool $forceUpdate = false): void
     {
         $vendorDir = $this->composer->getConfig()->get('vendor-dir');
-        $projectDir = dirname((string) $vendorDir);
-        $packageDir = $vendorDir . '/nowo-tech/code-review-guardian';
+        $projectDir = \dirname((string) $vendorDir);
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
 
         // If package is not in vendor (development mode), use current directory
         if (!is_dir($packageDir)) {
-            $packageDir = __DIR__ . '/..';
+            $packageDir = __DIR__.'/..';
         }
 
         // Detect framework
-        $composerJsonPath = $projectDir . '/composer.json';
+        $composerJsonPath = $projectDir.'/composer.json';
         $framework = FrameworkDetector::detect($composerJsonPath);
         $configDir = FrameworkDetector::getConfigDirectory($framework);
 
-        $io->write(sprintf('<info>Detected framework: %s</info>', strtoupper($framework)));
+        $io->write(\sprintf('<info>Detected framework: %s</info>', strtoupper($framework)));
 
         // Install code review script
         // Note: The .sh script is ALWAYS updated to ensure users have the latest version
@@ -137,20 +138,20 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         ];
 
         foreach ($files as $source => $dest) {
-            $sourcePath = $packageDir . '/' . $source;
-            $destPath = $projectDir . '/' . $dest;
+            $sourcePath = $packageDir.'/'.$source;
+            $destPath = $projectDir.'/'.$dest;
 
             if (!file_exists($sourcePath)) {
-                $io->writeError(sprintf('<warning>Source file not found: %s</warning>', $sourcePath));
+                $io->writeError(\sprintf('<warning>Source file not found: %s</warning>', $sourcePath));
                 continue;
             }
 
             // Always update the script file, regardless of $forceUpdate flag
             // This ensures users always have the latest version with bug fixes and new features
             if (file_exists($destPath)) {
-                $io->write(sprintf('<info>Updating %s</info>', $dest));
+                $io->write(\sprintf('<info>Updating %s</info>', $dest));
             } else {
-                $io->write(sprintf('<info>Installing %s</info>', $dest));
+                $io->write(\sprintf('<info>Installing %s</info>', $dest));
             }
 
             copy($sourcePath, $destPath);
@@ -181,13 +182,13 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         string $projectDir,
         string $configDir,
         IOInterface $io,
-        bool $forceUpdate
+        bool $forceUpdate,
     ): void {
-        $configSourceDir = $packageDir . '/config/' . $configDir;
+        $configSourceDir = $packageDir.'/config/'.$configDir;
         $configDestDir = $projectDir;
 
         if (!is_dir($configSourceDir)) {
-            $io->writeError(sprintf('<warning>Configuration directory not found: %s</warning>', $configSourceDir));
+            $io->writeError(\sprintf('<warning>Configuration directory not found: %s</warning>', $configSourceDir));
 
             return;
         }
@@ -198,8 +199,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         ];
 
         foreach ($configFiles as $source => $dest) {
-            $sourcePath = $configSourceDir . '/' . $source;
-            $destPath = $configDestDir . '/' . $dest;
+            $sourcePath = $configSourceDir.'/'.$source;
+            $destPath = $configDestDir.'/'.$dest;
 
             if (!file_exists($sourcePath)) {
                 continue;
@@ -211,9 +212,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             }
 
             if (file_exists($destPath)) {
-                $io->write(sprintf('<info>Updating %s</info>', $dest));
+                $io->write(\sprintf('<info>Updating %s</info>', $dest));
             } else {
-                $io->write(sprintf('<info>Installing %s</info>', $dest));
+                $io->write(\sprintf('<info>Installing %s</info>', $dest));
             }
 
             copy($sourcePath, $destPath);
@@ -232,9 +233,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         string $packageDir,
         string $projectDir,
         IOInterface $io,
-        bool $forceUpdate
+        bool $forceUpdate,
     ): void {
-        $docsDestDir = $projectDir . '/docs';
+        $docsDestDir = $projectDir.'/docs';
 
         // Create docs directory if it doesn't exist
         if (!is_dir($docsDestDir)) {
@@ -242,14 +243,14 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         }
 
         // Detect framework for framework-specific AGENTS.md
-        $composerJsonPath = $projectDir . '/composer.json';
+        $composerJsonPath = $projectDir.'/composer.json';
         $framework = FrameworkDetector::detect($composerJsonPath);
         $configDir = FrameworkDetector::getConfigDirectory($framework);
 
         // AGENTS.md is framework-specific (from config/{framework}/AGENTS.md)
         // GGA.md is common (from docs/GGA.md)
-        $agentSourcePath = $packageDir . '/config/' . $configDir . '/AGENTS.md';
-        $ggaSourcePath = $packageDir . '/docs/GGA.md';
+        $agentSourcePath = $packageDir.'/config/'.$configDir.'/AGENTS.md';
+        $ggaSourcePath = $packageDir.'/docs/GGA.md';
 
         // List of documentation files to install (source => dest)
         $docFiles = [];
@@ -265,7 +266,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         }
 
         foreach ($docFiles as $sourcePath => $dest) {
-            $destPath = $docsDestDir . '/' . $dest;
+            $destPath = $docsDestDir.'/'.$dest;
 
             if (!file_exists($sourcePath)) {
                 continue;
@@ -277,25 +278,13 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             }
 
             if (file_exists($destPath)) {
-                $io->write(sprintf('<info>Updating %s</info>', $dest));
+                $io->write(\sprintf('<info>Updating %s</info>', $dest));
             } else {
-                $io->write(sprintf('<info>Installing %s</info>', $dest));
+                $io->write(\sprintf('<info>Installing %s</info>', $dest));
             }
 
             copy($sourcePath, $destPath);
         }
-    }
-
-    /**
-     * Update .gitignore on update (without regenerating files).
-     *
-     * @param IOInterface $io The IO interface
-     */
-    private function updateGitignoreOnUpdate(IOInterface $io): void
-    {
-        $vendorDir = $this->composer->getConfig()->get('vendor-dir');
-        $projectDir = dirname((string) $vendorDir);
-        $this->updateGitignore($projectDir, $io);
     }
 
     /**
@@ -306,7 +295,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     private function updateGitignore(string $projectDir, IOInterface $io): void
     {
-        $gitignorePath = $projectDir . '/.gitignore';
+        $gitignorePath = $projectDir.'/.gitignore';
         $entriesToAdd = [
             'code-review-guardian.sh',
             'code-review-guardian.yaml',
@@ -317,6 +306,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
         if (file_exists($gitignorePath)) {
             $content = file_get_contents($gitignorePath);
+            if (false === $content) {
+                $content = '';
+            }
             $lines = explode("\n", $content);
         }
 
@@ -324,16 +316,16 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $existingEntries = array_map('trim', $lines);
 
         foreach ($entriesToAdd as $entry) {
-            if (!in_array($entry, $existingEntries, true)) {
+            if (!\in_array($entry, $existingEntries, true)) {
                 // Add a comment if this is the first entry and file exists
-                if (!$updated && file_exists($gitignorePath) && !empty($content)) {
+                if (!$updated && file_exists($gitignorePath) && ('' !== $content && '0' !== $content)) {
                     $trimmedContent = trim($content);
-                    if ($trimmedContent !== '' && substr($trimmedContent, -1) !== "\n") {
+                    if ('' !== $trimmedContent && "\n" !== substr($trimmedContent, -1)) {
                         $lines[] = '';
                     }
                 }
                 // Add comment header if this is the first Code Review Guardian entry
-                if (!$updated && !in_array('# Code Review Guardian', $existingEntries, true)) {
+                if (!$updated && !\in_array('# Code Review Guardian', $existingEntries, true)) {
                     $lines[] = '# Code Review Guardian';
                 }
                 $lines[] = $entry;
@@ -342,7 +334,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         }
 
         if ($updated) {
-            file_put_contents($gitignorePath, implode("\n", $lines) . "\n");
+            file_put_contents($gitignorePath, implode("\n", $lines)."\n");
             $io->write('<info>Updated .gitignore to exclude Code Review Guardian files</info>');
         }
     }
@@ -355,7 +347,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     private function removeFiles(IOInterface $io): void
     {
         $vendorDir = $this->composer->getConfig()->get('vendor-dir');
-        $projectDir = dirname((string) $vendorDir);
+        $projectDir = \dirname((string) $vendorDir);
 
         $io->write('<info>Removing Code Review Guardian files...</info>');
 
@@ -367,30 +359,30 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
         $removedCount = 0;
         foreach ($files as $file) {
-            $path = $projectDir . '/' . $file;
+            $path = $projectDir.'/'.$file;
 
             if (file_exists($path)) {
-                $io->write(sprintf('  <comment>-</comment> Removing <info>%s</info>', $file), false);
+                $io->write(\sprintf('  <comment>-</comment> Removing <info>%s</info>', $file), false);
                 unlink($path);
                 $io->write(' <info>✓</info>');
-                $removedCount++;
+                ++$removedCount;
             }
         }
 
         // Remove documentation files
-        $docsDir = $projectDir . '/docs';
+        $docsDir = $projectDir.'/docs';
         $docFiles = [
             'AGENTS.md',
         ];
 
         foreach ($docFiles as $file) {
-            $path = $docsDir . '/' . $file;
+            $path = $docsDir.'/'.$file;
 
             if (file_exists($path)) {
-                $io->write(sprintf('  <comment>-</comment> Removing <info>docs/%s</info>', $file), false);
+                $io->write(\sprintf('  <comment>-</comment> Removing <info>docs/%s</info>', $file), false);
                 unlink($path);
                 $io->write(' <info>✓</info>');
-                $removedCount++;
+                ++$removedCount;
             }
         }
 
@@ -399,7 +391,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $this->removeGitignoreEntries($projectDir, $io);
 
         if ($removedCount > 0) {
-            $io->write(sprintf('<info>✓ Removed %d file(s) successfully</info>', $removedCount));
+            $io->write(\sprintf('<info>✓ Removed %d file(s) successfully</info>', $removedCount));
         } else {
             $io->write('<info>No files to remove (already cleaned up)</info>');
         }
@@ -413,13 +405,17 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     private function removeGitignoreEntries(string $projectDir, IOInterface $io): void
     {
-        $gitignorePath = $projectDir . '/.gitignore';
+        $gitignorePath = $projectDir.'/.gitignore';
 
         if (!file_exists($gitignorePath)) {
             return;
         }
 
         $content = file_get_contents($gitignorePath);
+        if (false === $content) {
+            return;
+        }
+
         $lines = explode("\n", $content);
 
         $entriesToRemove = [
@@ -435,24 +431,24 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             $trimmedLine = trim($line);
 
             // Check if this is the Code Review Guardian section comment
-            if ($trimmedLine === '# Code Review Guardian') {
+            if ('# Code Review Guardian' === $trimmedLine) {
                 $skipSection = true;
                 continue;
             }
 
             // Check if we should skip this line (it's an entry to remove)
-            if ($skipSection && in_array($trimmedLine, $entriesToRemove, true)) {
+            if ($skipSection && \in_array($trimmedLine, $entriesToRemove, true)) {
                 $updated = true;
                 continue;
             }
 
             // If we encounter a non-empty line that's not in our entries, stop skipping
-            if ($skipSection && $trimmedLine !== '' && !in_array($trimmedLine, $entriesToRemove, true)) {
+            if ($skipSection && '' !== $trimmedLine && !\in_array($trimmedLine, $entriesToRemove, true)) {
                 $skipSection = false;
             }
 
             // Also check for entries not in the section
-            if (!$skipSection && in_array($trimmedLine, $entriesToRemove, true)) {
+            if (!$skipSection && \in_array($trimmedLine, $entriesToRemove, true)) {
                 $updated = true;
                 continue;
             }
@@ -461,13 +457,13 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         }
 
         // Remove trailing empty lines after the section if section was removed
-        while (!empty($newLines) && trim(end($newLines)) === '') {
+        while ([] !== $newLines && '' === trim(end($newLines))) {
             array_pop($newLines);
         }
 
         if ($updated) {
             $io->write('  <comment>-</comment> Removing entries from <info>.gitignore</info>', false);
-            file_put_contents($gitignorePath, implode("\n", $newLines) . "\n");
+            file_put_contents($gitignorePath, implode("\n", $newLines)."\n");
             $io->write(' <info>✓</info>');
         }
     }

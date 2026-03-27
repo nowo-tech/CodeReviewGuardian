@@ -1,8 +1,27 @@
 # Code Review Guardian
 
-[![CI](https://github.com/nowo-tech/CodeReviewGuardian/actions/workflows/ci.yml/badge.svg)](https://github.com/nowo-tech/CodeReviewGuardian/actions/workflows/ci.yml) [![Latest Stable Version](https://poser.pugx.org/nowo-tech/code-review-guardian/v)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![License](https://poser.pugx.org/nowo-tech/code-review-guardian/license)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![PHP Version Require](https://poser.pugx.org/nowo-tech/code-review-guardian/require/php)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![GitHub stars](https://img.shields.io/github/stars/nowo-tech/CodeReviewGuardian.svg?style=social&label=Star)](https://github.com/nowo-tech/CodeReviewGuardian)
+[![CI](https://github.com/nowo-tech/CodeReviewGuardian/actions/workflows/ci.yml/badge.svg)](https://github.com/nowo-tech/CodeReviewGuardian/actions/workflows/ci.yml) [![Packagist Version](https://img.shields.io/packagist/v/nowo-tech/code-review-guardian.svg?style=flat)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![Packagist Downloads](https://img.shields.io/packagist/dt/nowo-tech/code-review-guardian.svg)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![PHP](https://img.shields.io/badge/PHP-8.1%2B-777BB4?logo=php)](https://php.net) [![Symfony](https://img.shields.io/badge/Symfony-6%20%7C%207%20%7C%208-000000?logo=symfony)](https://symfony.com) [![GitHub stars](https://img.shields.io/github/stars/nowo-tech/code-review-guardian.svg?style=social&label=Star)](https://github.com/nowo-tech/CodeReviewGuardian) [![Coverage](https://img.shields.io/badge/Coverage-100%25-brightgreen)](#tests-and-coverage)
 
-> ⭐ **Found this project useful?** Give it a star on GitHub! It helps us maintain and improve the project.
+> ⭐ **Found this useful?** Install from [Packagist](https://packagist.org/packages/nowo-tech/code-review-guardian) and give the repository a star on [GitHub](https://github.com/nowo-tech/CodeReviewGuardian) if it helps your workflow.
+
+## Documentation
+
+- [Installation](docs/INSTALLATION.md)
+- [Configuration](docs/CONFIGURATION.md)
+- [Usage](docs/USAGE.md)
+- [Contributing](docs/CONTRIBUTING.md)
+- [Changelog](docs/CHANGELOG.md)
+- [Upgrading](docs/UPGRADING.md)
+- [Release](docs/RELEASE.md)
+- [Security](docs/SECURITY.md)
+- [Engram](docs/ENGRAM.md)
+
+### Additional documentation
+
+- [Token setup](docs/TOKEN_SETUP.md)
+- [Git Guardian Angel (GGA)](docs/GGA.md)
+- [AI agents configuration](docs/AGENTS_CONFIG.md)
+- [Branching strategy](docs/BRANCHING.md)
 
 Provider-agnostic code review guardian for PHP projects. Works with any PHP project: **Symfony**, **Laravel**, **Yii**, **CodeIgniter**, **Slim**, **Laminas**, etc. and any Git provider: **GitHub**, **GitLab**, **Bitbucket**, etc.
 
@@ -11,9 +30,9 @@ Provider-agnostic code review guardian for PHP projects. Works with any PHP proj
 - ✅ Works with any PHP project
 - ✅ Works with any Git provider (GitHub, GitLab, Bitbucket, etc.)
 - ✅ **Multi-framework support** with automatic framework detection:
-  - **Symfony**: Optimized configuration for Symfony projects
-  - **Laravel**: Optimized configuration for Laravel projects
-  - **Generic**: Works with any PHP framework
+ - **Symfony**: Optimized configuration for Symfony projects
+ - **Laravel**: Optimized configuration for Laravel projects
+ - **Generic**: Works with any PHP framework
 - ✅ **Automatic configuration**: Installs framework-specific configuration files
 - ✅ **Git Guardian Angel (GGA)**: Provider-agnostic code review system
 - ✅ **AI Agents support**: Configure AI-powered code review agents (OpenAI, Anthropic, GitHub Copilot)
@@ -28,18 +47,22 @@ composer require --dev nowo-tech/code-review-guardian
 ```
 
 After installation, the following files will be copied to your project:
-- `code-review-guardian.sh` - Minimal entry point script (project root, ~40 lines)
-  - **Automatically updated** on every `composer install` and `composer update`
-  - Acts as a lightweight wrapper that delegates to the implementation in `vendor/`
-  - Automatically detects vendor directory and executes the main script
+- `code-review-guardian.sh` - Minimal entry point script (project root; about **40** lines — exact count may change between releases)
+ - **Automatically updated** on every `composer install` and `composer update`
+ - Acts as a lightweight wrapper that delegates to the implementation in `vendor/`
+ - Automatically detects vendor directory and executes the main script
 - `code-review-guardian.yaml` - Configuration file (framework-specific, project root)
-  - Only installed if it doesn't exist (to preserve your customizations)
+ - Only installed if it doesn't exist (to preserve your customizations)
 - `docs/AGENTS.md` - Code review rules file (framework-specific, used by GGA)
 - `docs/GGA.md` - Git Guardian Angel setup guide
 
 **Note:** The actual implementation code runs from `vendor/nowo-tech/code-review-guardian/bin/`, keeping your project root clean and minimal.
 
-**Note:** Script and config files are automatically added to your `.gitignore` during installation.
+**Note:** The wrapper script and `code-review-guardian.yaml` are added to your `.gitignore` during installation (files under `docs/` installed by the plugin are not ignored automatically).
+
+### Removing the package
+
+When you run `composer remove nowo-tech/code-review-guardian`, the plugin removes `code-review-guardian.sh`, `code-review-guardian.yaml`, and `docs/AGENTS.md`, and cleans the Code Review Guardian block from `.gitignore`. **`docs/GGA.md` is not removed** — delete it manually if you no longer need it.
 
 ### Environment Configuration
 
@@ -57,19 +80,19 @@ See [`docs/TOKEN_SETUP.md`](docs/TOKEN_SETUP.md) for detailed step-by-step instr
 Code Review Guardian provides a complete infrastructure for code review automation:
 
 - ✅ **Fully Implemented:**
-  - Composer plugin (automatic installation)
-  - Automatic framework detection
-  - Configuration file installation
-  - Dependency validation script
-  - YAML configuration parsing and loading
-  - File filtering according to configured patterns
-  - Rules file reading (AGENTS.md)
+ - Composer plugin (automatic installation)
+ - Automatic framework detection
+ - Configuration file installation
+ - Dependency validation script
+ - YAML configuration parsing and loading
+ - File filtering according to configured patterns
+ - Rules file reading (AGENTS.md)
 
 - 🚧 **In Development:**
-  - Full integration with AI APIs (OpenAI, Anthropic, GitHub Copilot)
-  - Actual code review execution using AI models
-  - Automatic comment posting to PR/MR
-  - Automatic Git provider detection from URL
+ - Full integration with AI APIs (OpenAI, Anthropic, GitHub Copilot)
+ - Actual code review execution using AI models
+ - Automatic comment posting to PR/MR
+ - Automatic Git provider detection from URL
 
 The script currently validates configuration, filters files correctly, and is ready for AI API integration. Full review functionality is under active development.
 
@@ -122,18 +145,18 @@ Configuration is stored in `code-review-guardian.yaml`. The file is automaticall
 framework: symfony
 
 git:
-  provider: auto
-  api_token_env: GIT_TOKEN
+ provider: auto
+ api_token_env: GIT_TOKEN
 
 gga:
-  enabled: true
-  auto_review: true
-  post_comments: true
+ enabled: true
+ auto_review: true
+ post_comments: true
 
 agents:
-  enabled: false
-  provider: openai
-  model: gpt-4
+ enabled: false
+ provider: openai
+ model: gpt-4
 ```
 
 ### Laravel Configuration Example
@@ -142,18 +165,18 @@ agents:
 framework: laravel
 
 git:
-  provider: auto
-  api_token_env: GIT_TOKEN
+ provider: auto
+ api_token_env: GIT_TOKEN
 
 gga:
-  enabled: true
-  auto_review: true
-  post_comments: true
+ enabled: true
+ auto_review: true
+ post_comments: true
 
 agents:
-  enabled: false
-  provider: openai
-  model: gpt-4
+ enabled: false
+ provider: openai
+ model: gpt-4
 ```
 
 ### Git Provider Token Configuration
@@ -162,7 +185,7 @@ The configuration file references a token from your `.env` file:
 
 ```yaml
 git:
-  api_token_env: GIT_TOKEN  # Reads from .env file
+ api_token_env: GIT_TOKEN # Reads from .env file
 ```
 
 Make sure to add your token to `.env`:
@@ -199,9 +222,13 @@ Git provider detection is planned for a future release. Currently, you can confi
 
 ## Requirements
 
-- PHP >= 7.4
+- PHP >= 8.1 (see `composer.json` for the exact range)
 - Composer 2.x
 - Git
+
+## Version information
+
+Supported PHP ranges and dependencies are defined in [`composer.json`](composer.json). Release history and migration notes are in [`docs/CHANGELOG.md`](docs/CHANGELOG.md).
 
 ## Development
 
@@ -278,11 +305,15 @@ composer qa
 | `make shell` | Open shell in container |
 | `make install` | Install Composer dependencies |
 | `make test` | Run PHPUnit tests |
-| `make test-coverage` | Run tests with code coverage |
-| `make cs-check` | Check code style (PSR-12) |
+| `make test-coverage` | Run tests with coverage and print the PHP Lines coverage line |
+| `make cs-check` | Check code style (PHP-CS-Fixer) |
 | `make cs-fix` | Fix code style |
-| `make qa` | Run all QA checks |
-| `make clean` | Remove vendor and cache |
+| `make rector` / `make rector-dry` | Run Rector (apply or dry-run) |
+| `make phpstan` | Run PHPStan |
+| `make qa` | Run `cs-check` and tests |
+| `make release-check` | Full pre-release pipeline (see Makefile) |
+| `make composer-sync` | Validate `composer.json` and install dependencies in the container |
+| `make clean` | Remove vendor, cache, and coverage artifacts |
 | `make setup-hooks` | Install git pre-commit hooks |
 
 ## Continuous Integration
@@ -295,35 +326,14 @@ name: Code Review
 on: [pull_request]
 
 jobs:
-  code-review:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: php-actions/composer@v6
-      - run: composer require --dev nowo-tech/code-review-guardian
-      - run: ./code-review-guardian.sh
+ code-review:
+  runs-on: ubuntu-latest
+  steps:
+   - uses: actions/checkout@v3
+   - uses: php-actions/composer@v6
+   - run: composer require --dev nowo-tech/code-review-guardian
+   - run: ./code-review-guardian.sh
 ```
-
-## Contributing
-
-Please see [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for details on how to contribute to this project.
-
-For branching strategy, see [docs/BRANCHING.md](docs/BRANCHING.md).
-
-## Changelog
-
-Please see [docs/CHANGELOG.md](docs/CHANGELOG.md) for version history.
-
-## Upgrading
-
-Please see [docs/UPGRADING.md](docs/UPGRADING.md) for upgrade instructions and migration notes.
-
-## Documentation
-
-- **[Configuration Guide](docs/CONFIGURATION.md)** - Detailed configuration options and examples
-- **[Contributing Guide](docs/CONTRIBUTING.md)** - How to contribute to the project
-- **[Branching Strategy](docs/BRANCHING.md)** - Git workflow and branching policies
-- **[Changelog](docs/CHANGELOG.md)** - Version history and changes
 
 ## Related Packages
 
@@ -348,6 +358,13 @@ Together with Code Review Guardian, you get a complete development workflow:
 ## Author
 
 Created by [Héctor Franco Aceituno](https://github.com/HecFranco) at [Nowo.tech](https://nowo.tech)
+
+## Tests and coverage
+
+- Tests: PHPUnit (unit and integration suites)
+- PHP: 100%
+- TS/JS: N/A
+- Python: N/A
 
 ## License
 

@@ -1,3 +1,5 @@
+name: code-review-guardian
+
 services:
   php:
     build: .
@@ -6,10 +8,12 @@ services:
     volumes:
       - .:/app
       - composer-cache:/root/.composer/cache
+      - coverage-data:/app/coverage
     environment:
       - COMPOSER_ALLOW_SUPERUSER=1
     command: ["tail", "-f", "/dev/null"]
 
 volumes:
   composer-cache:
+  coverage-data:
 

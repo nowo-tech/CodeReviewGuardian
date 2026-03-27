@@ -18,7 +18,7 @@ final class FrameworkDetectorTest extends TestCase
 {
     public function testDetectSymfony(): void
     {
-        $composerJsonPath = __DIR__ . '/fixtures/composer-symfony.json';
+        $composerJsonPath = __DIR__.'/../fixtures/composer-symfony.json';
         $this->createComposerJson($composerJsonPath, ['symfony/framework-bundle' => '^6.0']);
 
         $framework = FrameworkDetector::detect($composerJsonPath);
@@ -30,7 +30,7 @@ final class FrameworkDetectorTest extends TestCase
 
     public function testDetectLaravel(): void
     {
-        $composerJsonPath = __DIR__ . '/fixtures/composer-laravel.json';
+        $composerJsonPath = __DIR__.'/../fixtures/composer-laravel.json';
         $this->createComposerJson($composerJsonPath, ['laravel/framework' => '^10.0']);
 
         $framework = FrameworkDetector::detect($composerJsonPath);
@@ -42,7 +42,7 @@ final class FrameworkDetectorTest extends TestCase
 
     public function testDetectYii2(): void
     {
-        $composerJsonPath = __DIR__ . '/fixtures/composer-yii2.json';
+        $composerJsonPath = __DIR__.'/../fixtures/composer-yii2.json';
         $this->createComposerJson($composerJsonPath, ['yiisoft/yii2' => '^2.0']);
 
         $framework = FrameworkDetector::detect($composerJsonPath);
@@ -54,7 +54,7 @@ final class FrameworkDetectorTest extends TestCase
 
     public function testDetectYii3(): void
     {
-        $composerJsonPath = __DIR__ . '/fixtures/composer-yii3.json';
+        $composerJsonPath = __DIR__.'/../fixtures/composer-yii3.json';
         $this->createComposerJson($composerJsonPath, ['yiisoft/yii' => '^3.0']);
 
         $framework = FrameworkDetector::detect($composerJsonPath);
@@ -66,7 +66,7 @@ final class FrameworkDetectorTest extends TestCase
 
     public function testDetectCakePHP(): void
     {
-        $composerJsonPath = __DIR__ . '/fixtures/composer-cakephp.json';
+        $composerJsonPath = __DIR__.'/../fixtures/composer-cakephp.json';
         $this->createComposerJson($composerJsonPath, ['cakephp/cakephp' => '^5.0']);
 
         $framework = FrameworkDetector::detect($composerJsonPath);
@@ -78,7 +78,7 @@ final class FrameworkDetectorTest extends TestCase
 
     public function testDetectLaminas(): void
     {
-        $composerJsonPath = __DIR__ . '/fixtures/composer-laminas.json';
+        $composerJsonPath = __DIR__.'/../fixtures/composer-laminas.json';
         $this->createComposerJson($composerJsonPath, ['laminas/laminas-mvc' => '^3.0']);
 
         $framework = FrameworkDetector::detect($composerJsonPath);
@@ -90,7 +90,7 @@ final class FrameworkDetectorTest extends TestCase
 
     public function testDetectCodeIgniter(): void
     {
-        $composerJsonPath = __DIR__ . '/fixtures/composer-codeigniter.json';
+        $composerJsonPath = __DIR__.'/../fixtures/composer-codeigniter.json';
         $this->createComposerJson($composerJsonPath, ['codeigniter4/framework' => '^4.0']);
 
         $framework = FrameworkDetector::detect($composerJsonPath);
@@ -102,7 +102,7 @@ final class FrameworkDetectorTest extends TestCase
 
     public function testDetectSlim(): void
     {
-        $composerJsonPath = __DIR__ . '/fixtures/composer-slim.json';
+        $composerJsonPath = __DIR__.'/../fixtures/composer-slim.json';
         $this->createComposerJson($composerJsonPath, ['slim/slim' => '^4.0']);
 
         $framework = FrameworkDetector::detect($composerJsonPath);
@@ -114,7 +114,7 @@ final class FrameworkDetectorTest extends TestCase
 
     public function testDetectGeneric(): void
     {
-        $composerJsonPath = __DIR__ . '/fixtures/composer-generic.json';
+        $composerJsonPath = __DIR__.'/../fixtures/composer-generic.json';
         $this->createComposerJson($composerJsonPath, ['some/package' => '^1.0']);
 
         $framework = FrameworkDetector::detect($composerJsonPath);
@@ -133,8 +133,8 @@ final class FrameworkDetectorTest extends TestCase
 
     public function testDetectWithInvalidJson(): void
     {
-        $composerJsonPath = __DIR__ . '/fixtures/composer-invalid.json';
-        $dir = dirname($composerJsonPath);
+        $composerJsonPath = __DIR__.'/../fixtures/composer-invalid.json';
+        $dir = \dirname($composerJsonPath);
         if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
         }
@@ -150,8 +150,8 @@ final class FrameworkDetectorTest extends TestCase
 
     public function testDetectWithRequireDev(): void
     {
-        $composerJsonPath = __DIR__ . '/fixtures/composer-require-dev.json';
-        $dir = dirname($composerJsonPath);
+        $composerJsonPath = __DIR__.'/../fixtures/composer-require-dev.json';
+        $dir = \dirname($composerJsonPath);
         if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
         }
@@ -162,7 +162,7 @@ final class FrameworkDetectorTest extends TestCase
             'require-dev' => ['symfony/framework-bundle' => '^6.0'],
         ];
 
-        file_put_contents($composerJsonPath, json_encode($composerJson, JSON_PRETTY_PRINT));
+        file_put_contents($composerJsonPath, json_encode($composerJson, \JSON_PRETTY_PRINT));
 
         $framework = FrameworkDetector::detect($composerJsonPath);
 
@@ -173,8 +173,8 @@ final class FrameworkDetectorTest extends TestCase
 
     public function testDetectWithEmptyComposerJson(): void
     {
-        $composerJsonPath = __DIR__ . '/fixtures/composer-empty.json';
-        $dir = dirname($composerJsonPath);
+        $composerJsonPath = __DIR__.'/../fixtures/composer-empty.json';
+        $dir = \dirname($composerJsonPath);
         if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
         }
@@ -213,7 +213,7 @@ final class FrameworkDetectorTest extends TestCase
      */
     private function createComposerJson(string $path, array $require): void
     {
-        $dir = dirname($path);
+        $dir = \dirname($path);
         if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
         }
@@ -223,6 +223,6 @@ final class FrameworkDetectorTest extends TestCase
             'require' => $require,
         ];
 
-        file_put_contents($path, json_encode($composerJson, JSON_PRETTY_PRINT));
+        file_put_contents($path, json_encode($composerJson, \JSON_PRETTY_PRINT));
     }
 }

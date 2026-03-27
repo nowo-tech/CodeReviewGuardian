@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Bundle standards alignment** — Root `Makefile` targets (`release-check`, `composer-sync`, Rector, PHPStan), `composer.json` `archive.exclude`, canonical `## Documentation` and badges, `docs/INSTALLATION.md`, `docs/USAGE.md`, `docs/RELEASE.md`, `docs/ENGRAM.md`, `.scripts/php-coverage-percent.sh`, `phpstan-baseline.neon`, issue/PR/security templates, and CI on PHP 8.1–8.3. Docker Compose `name: code-review-guardian` and `coverage-data` volume.
+
+### Fixed
+
+- **Composer lock vs Docker PHP 8.2** — `config.platform.php` set to `8.1.0` so `composer.lock` resolves Symfony 6.4 / compatible dev tools (not Symfony 8, which requires PHP ≥8.4). Restores `docker compose build` and `make test-coverage` on the `php:8.2-cli` image.
+
+### Changed
+
+- **CI** — PHPStan job on pull requests; Composer cache key includes `composer.lock`.
+
+### Documentation
+
+- **README** — Clarified wrapper script line count (approximate, may change); `.gitignore` only covers root script and YAML; added **Removing the package** (`composer remove` removes script, YAML, `docs/AGENTS.md`, and `.gitignore` entries — not `docs/GGA.md`). Documentation index now includes TOKEN_SETUP, GGA, AGENTS_CONFIG, and UPGRADING.
+- **Plugin.php** — Expanded `installFiles()` docblock to match actual install/update behavior.
+
 ## [1.0.1] - 2026-01-11
 
 ### Fixed

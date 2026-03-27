@@ -66,9 +66,14 @@ class FrameworkDetector
             return self::FRAMEWORK_GENERIC;
         }
 
-        $composerJson = json_decode(file_get_contents($composerJsonPath), true);
+        $raw = file_get_contents($composerJsonPath);
+        if (false === $raw) {
+            return self::FRAMEWORK_GENERIC;
+        }
 
-        if (!is_array($composerJson)) {
+        $composerJson = json_decode($raw, true);
+
+        if (!\is_array($composerJson)) {
             return self::FRAMEWORK_GENERIC;
         }
 
