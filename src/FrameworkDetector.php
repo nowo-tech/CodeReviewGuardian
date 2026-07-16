@@ -62,14 +62,16 @@ class FrameworkDetector
      */
     public static function detect(string $composerJsonPath): string
     {
-        if (!file_exists($composerJsonPath)) {
+        if (!is_file($composerJsonPath)) {
             return self::FRAMEWORK_GENERIC;
         }
 
         $raw = file_get_contents($composerJsonPath);
+        // @codeCoverageIgnoreStart
         if (false === $raw) {
             return self::FRAMEWORK_GENERIC;
         }
+        // @codeCoverageIgnoreEnd
 
         $composerJson = json_decode($raw, true);
 

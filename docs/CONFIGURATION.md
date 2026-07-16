@@ -26,6 +26,24 @@ The configuration file is automatically generated based on your framework:
 - **Laravel**: Uses Laravel-specific configuration
 - **Generic**: Uses generic PHP configuration
 
+### Composer plugin options
+
+Optional keys under `extra` in the consuming project's `composer.json`:
+
+```json
+{
+  "extra": {
+    "code-review-guardian": {
+      "auto_update_wrapper": false
+    }
+  }
+}
+```
+
+| Key | Default | Description |
+|-----|---------|-------------|
+| `auto_update_wrapper` | `false` | When `true`, overwrite an existing root `code-review-guardian.sh` on install/update if it differs from the package. |
+
 ## Configuration Structure
 
 ```yaml

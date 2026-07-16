@@ -22,6 +22,48 @@ This guide will help you upgrade Code Review Guardian to newer versions.
 
 ## Version-Specific Upgrade Notes
 
+### Upgrading to 1.1.0
+
+This release changes how the root wrapper script is refreshed on `composer install` / `composer update`, and expands CI/tooling. No configuration file format changes.
+
+#### Behavior change: wrapper script updates are opt-in
+
+Previously, `code-review-guardian.sh` in the project root was overwritten on every install/update.
+
+From 1.1.0:
+
+- Missing wrapper → installed as before
+- Same content as the package → left unchanged
+- Local wrapper differs → **not** overwritten; Composer shows a warning with MD5s
+
+To restore automatic overwrite of the wrapper, add to your project's `composer.json`:
+
+```json
+{
+  "extra": {
+    "code-review-guardian": {
+      "auto_update_wrapper": true
+    }
+  }
+}
+```
+
+Then run `composer update nowo-tech/code-review-guardian` (or delete the local script and reinstall to get a fresh copy).
+
+#### What You Need to Do
+
+1. Update the package:
+   ```bash
+   composer update nowo-tech/code-review-guardian
+   ```
+2. If you rely on the package always refreshing the root script, enable `auto_update_wrapper` as above.
+3. Otherwise, no action required — custom local wrappers are preserved by default.
+
+#### Other notes
+
+- Package still supports PHP `>=8.1 <8.6`. CI focuses on PHP 8.2–8.5 with Symfony 7.4 / 8.0 / 8.1.
+- YAML config, GGA docs install rules, and uninstall behavior are unchanged (except wrapper overwrite policy above).
+
 ### Upgrading to 1.0.1
 
 This is a patch release that improves development experience and test stability. No breaking changes.

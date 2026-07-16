@@ -17,3 +17,5 @@ Pushing a `v*` tag triggers `.github/workflows/release.yml`, which creates a Git
 ## Maintenance
 
 The workflow `.github/workflows/sync-releases.yml` can backfill or update GitHub Releases for existing tags.
+
+After creating the release commit and tag, run `make check-no-cursor-coauthor` again **before** `git push` (REQ-GIT-001). The release commit itself is not covered by an earlier `release-check` run.

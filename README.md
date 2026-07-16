@@ -1,20 +1,25 @@
 # Code Review Guardian
 
-[![CI](https://github.com/nowo-tech/CodeReviewGuardian/actions/workflows/ci.yml/badge.svg)](https://github.com/nowo-tech/CodeReviewGuardian/actions/workflows/ci.yml) [![Packagist Version](https://img.shields.io/packagist/v/nowo-tech/code-review-guardian.svg?style=flat)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![Packagist Downloads](https://img.shields.io/packagist/dt/nowo-tech/code-review-guardian.svg)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![PHP](https://img.shields.io/badge/PHP-8.1%2B-777BB4?logo=php)](https://php.net) [![Symfony](https://img.shields.io/badge/Symfony-6%20%7C%207%20%7C%208-000000?logo=symfony)](https://symfony.com) [![GitHub stars](https://img.shields.io/github/stars/nowo-tech/code-review-guardian.svg?style=social&label=Star)](https://github.com/nowo-tech/CodeReviewGuardian) [![Coverage](https://img.shields.io/badge/Coverage-100%25-brightgreen)](#tests-and-coverage)
+[![CI](https://github.com/nowo-tech/CodeReviewGuardian/actions/workflows/ci.yml/badge.svg)](https://github.com/nowo-tech/CodeReviewGuardian/actions/workflows/ci.yml) [![Packagist Version](https://img.shields.io/packagist/v/nowo-tech/code-review-guardian.svg?style=flat)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![Packagist Downloads](https://img.shields.io/packagist/dt/nowo-tech/code-review-guardian.svg)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![PHP](https://img.shields.io/badge/PHP-8.1%2B-777BB4?logo=php)](https://php.net) [![Symfony](https://img.shields.io/badge/Symfony-6.0%2B%20%7C%207.4%2B%20%7C%208.0%20%7C%208.1%2B-000000?logo=symfony)](https://symfony.com)
 
 > ⭐ **Found this useful?** Install from [Packagist](https://packagist.org/packages/nowo-tech/code-review-guardian) and give the repository a star on [GitHub](https://github.com/nowo-tech/CodeReviewGuardian) if it helps your workflow.
 
 ## Documentation
 
+
+- [GitHub Actions CI requirements](docs/GITHUB_CI.md)
 - [Installation](docs/INSTALLATION.md)
 - [Configuration](docs/CONFIGURATION.md)
 - [Usage](docs/USAGE.md)
 - [Contributing](docs/CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Changelog](docs/CHANGELOG.md)
 - [Upgrading](docs/UPGRADING.md)
 - [Release](docs/RELEASE.md)
 - [Security](docs/SECURITY.md)
 - [Engram](docs/ENGRAM.md)
+- [Spec-driven development](docs/SPEC-DRIVEN-DEVELOPMENT.md)
+- [GitHub Spec Kit](docs/SPEC-KIT.md)
 
 ### Additional documentation
 
@@ -48,7 +53,8 @@ composer require --dev nowo-tech/code-review-guardian
 
 After installation, the following files will be copied to your project:
 - `code-review-guardian.sh` - Minimal entry point script (project root; about **40** lines — exact count may change between releases)
- - **Automatically updated** on every `composer install` and `composer update`
+ - Installed when missing; if a local copy differs from the package, it is left unchanged and a warning is shown
+ - To overwrite automatically on install/update, set `extra.code-review-guardian.auto_update_wrapper` to `true` in your project's `composer.json`
  - Acts as a lightweight wrapper that delegates to the implementation in `vendor/`
  - Automatically detects vendor directory and executes the main script
 - `code-review-guardian.yaml` - Configuration file (framework-specific, project root)
@@ -339,7 +345,7 @@ jobs:
 
 ### Composer Update Helper
 
-Want to keep your dependencies up to date? Check out **[Composer Update Helper](https://github.com/nowo-tech/composer-update-helper)** - a perfect complement to Code Review Guardian:
+Want to keep your dependencies up to date? Check out **[Composer Update Helper](https://github.com/nowo-tech/ComposerUpdateHelper)** - a perfect complement to Code Review Guardian:
 
 - ✅ **Works with any PHP project**: Symfony, Laravel, Yii, CodeIgniter, etc.
 - ✅ **Multi-framework support**: Automatic framework detection and version constraints

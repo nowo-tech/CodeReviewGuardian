@@ -4,6 +4,7 @@ COMPOSE ?= docker compose
 SERVICE_PHP ?= php
 
 .PHONY: help ensure-up up down build shell install assets test test-coverage \
+	check-no-cursor-coauthor strip-cursor-coauthor-from-history \
 	cs-check cs-fix rector rector-dry phpstan qa release-check composer-sync \
 	clean update validate setup-hooks
 
@@ -73,7 +74,7 @@ composer-sync: ensure-up
 	@$(COMPOSE) exec -T $(SERVICE_PHP) composer validate --strict
 	@$(COMPOSE) exec -T $(SERVICE_PHP) composer install --no-interaction
 
-release-check:
+release-check: check-no-cursor-coauthor
 	@$(MAKE) ensure-up
 	@$(MAKE) composer-sync
 	@$(MAKE) cs-fix
@@ -96,7 +97,21 @@ update: ensure-up
 validate: ensure-up
 	@$(COMPOSE) exec -T $(SERVICE_PHP) composer validate --strict
 
+check-no-cursor-coauthor:
+	@chmod +x .scripts/check-no-cursor-coauthor.sh
+	@./.scripts/check-no-cursor-coauthor.sh HEAD
+
 setup-hooks:
-	chmod +x .githooks/pre-commit
-	git config core.hooksPath .githooks
-	@echo "Git hooks installed (core.hooksPath=.githooks)."
+	@chmod +x .githooks/pre-commit 2>/dev/null || true
+	@chmod +x .githooks/commit-msg 2>/dev/null || true
+	@git config core.hooksPath .githooks
+	@echo "✅ Git hooks installed (.githooks — includes commit-msg for REQ-GIT-001)."
+
+
+# REQ-MAKE-008: update-deps (REQ-MAKE-008)
+BUNDLE_ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+include $(BUNDLE_ROOT)/../.scripts/Makefile.update-deps.mk
+
+strip-cursor-coauthor-from-history:
+	@chmod +x .scripts/strip-cursor-coauthor-from-history.sh
+	@./.scripts/strip-cursor-coauthor-from-history.sh main

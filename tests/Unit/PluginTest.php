@@ -377,15 +377,21 @@ final class PluginTest extends TestCase
         $binDir = $packageDir.'/bin';
         mkdir($binDir, 0777, true);
 
+        $composerJson = [
+            'name' => 'test/package',
+            'require' => ['symfony/framework-bundle' => '^6.0'],
+            'extra' => [
+                'code-review-guardian' => [
+                    'auto_update_wrapper' => true,
+                ],
+            ],
+        ];
+        file_put_contents($tempDir.'/composer.json', json_encode($composerJson, \JSON_PRETTY_PRINT));
+
         // Create existing .gitignore without Code Review Guardian entries
         file_put_contents($tempDir.'/.gitignore', "vendor/\n");
 
         // Create composer.json for framework detection
-        $composerJson = [
-            'name' => 'test/package',
-            'require' => ['symfony/framework-bundle' => '^6.0'],
-        ];
-        file_put_contents($tempDir.'/composer.json', json_encode($composerJson, \JSON_PRETTY_PRINT));
 
         // Create source script with new content
         $newScriptContent = '#!/bin/sh\necho "updated script"';
@@ -443,7 +449,6 @@ final class PluginTest extends TestCase
         $binDir = $packageDir.'/bin';
         mkdir($binDir, 0777, true);
 
-        // Don't create source file - should handle missing file gracefully
         $composerJson = [
             'name' => 'test/package',
             'require' => ['symfony/framework-bundle' => '^6.0'],
@@ -475,7 +480,6 @@ final class PluginTest extends TestCase
         $plugin->activate($composer, $io);
         $plugin->onPostInstall($event);
 
-        // Cleanup
         $this->removeDirectory($tempDir);
     }
 
@@ -1001,10 +1005,14 @@ final class PluginTest extends TestCase
         $binDir = $packageDir.'/bin';
         mkdir($binDir, 0777, true);
 
-        // Create composer.json for framework detection
         $composerJson = [
             'name' => 'test/package',
             'require' => ['symfony/framework-bundle' => '^6.0'],
+            'extra' => [
+                'code-review-guardian' => [
+                    'auto_update_wrapper' => true,
+                ],
+            ],
         ];
         file_put_contents($tempDir.'/composer.json', json_encode($composerJson, \JSON_PRETTY_PRINT));
 
@@ -1129,6 +1137,435 @@ final class PluginTest extends TestCase
         $this->assertFileExists($tempDir.'/docs/GGA.md');
 
         // Cleanup
+        $this->removeDirectory($tempDir);
+    }
+
+    public function testInstallOrUpdateWrapperScriptWarnsWhenLocalScriptDiffersWithoutOptIn(): void
+    {
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
+        $binDir = $packageDir.'/bin';
+        mkdir($binDir, 0777, true);
+
+        file_put_contents($binDir.'/code-review-guardian.sh', '#!/bin/sh\necho "package"');
+        file_put_contents($tempDir.'/code-review-guardian.sh', '#!/bin/sh\necho "local"');
+        file_put_contents($tempDir.'/composer.json', json_encode(['name' => 'test/package'], \JSON_PRETTY_PRINT));
+
+        $config = $this->createMock(Config::class);
+        $config->method('get')->with('vendor-dir')->willReturn($vendorDir);
+        $composer = $this->createMock(Composer::class);
+        $composer->method('getConfig')->willReturn($config);
+        $io = $this->createMock(IOInterface::class);
+        $io->expects($this->once())
+            ->method('write')
+            ->with($this->stringContains('differs from the package version'));
+
+        $plugin = new Plugin();
+        $plugin->activate($composer, $io);
+
+        $reflection = new \ReflectionClass($plugin);
+        $method = $reflection->getMethod('installOrUpdateWrapperScript');
+        $method->setAccessible(true);
+        $updated = $method->invoke(
+            $plugin,
+            $io,
+            $binDir.'/code-review-guardian.sh',
+            $tempDir.'/code-review-guardian.sh',
+            'code-review-guardian.sh',
+            false,
+        );
+
+        $this->assertFalse($updated);
+        $this->removeDirectory($tempDir);
+    }
+
+    public function testInstallOrUpdateWrapperScriptSkipsWhenChecksumMatches(): void
+    {
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        mkdir($tempDir, 0777, true);
+        $source = $tempDir.'/source.sh';
+        $dest = $tempDir.'/dest.sh';
+        file_put_contents($source, "#!/bin/sh\necho \"same\"\n");
+        copy($source, $dest);
+
+        $config = $this->createMock(Config::class);
+        $config->method('get')->with('vendor-dir')->willReturn($tempDir.'/vendor');
+        $composer = $this->createMock(Composer::class);
+        $composer->method('getConfig')->willReturn($config);
+        $io = $this->createMock(IOInterface::class);
+        $io->expects($this->never())->method('write');
+
+        $plugin = new Plugin();
+        $plugin->activate($composer, $io);
+
+        $reflection = new \ReflectionClass($plugin);
+        $method = $reflection->getMethod('installOrUpdateWrapperScript');
+        $method->setAccessible(true);
+        $updated = $method->invoke($plugin, $io, $source, $dest, 'code-review-guardian.sh', false);
+
+        $this->assertFalse($updated);
+        $this->removeDirectory($tempDir);
+    }
+
+    public function testInstallOrUpdateWrapperScriptForceUpdateOverwritesDifferingWrapper(): void
+    {
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        mkdir($tempDir, 0777, true);
+        $source = $tempDir.'/source.sh';
+        $dest = $tempDir.'/dest.sh';
+        file_put_contents($source, "#!/bin/sh\necho \"package\"\n");
+        file_put_contents($dest, "#!/bin/sh\necho \"local\"\n");
+
+        $config = $this->createMock(Config::class);
+        $config->method('get')->with('vendor-dir')->willReturn($tempDir.'/vendor');
+        $composer = $this->createMock(Composer::class);
+        $composer->method('getConfig')->willReturn($config);
+        $io = $this->createMock(IOInterface::class);
+        $io->expects($this->once())
+            ->method('write')
+            ->with($this->stringContains('Updating code-review-guardian.sh'));
+
+        $plugin = new Plugin();
+        $plugin->activate($composer, $io);
+
+        $reflection = new \ReflectionClass($plugin);
+        $method = $reflection->getMethod('installOrUpdateWrapperScript');
+        $method->setAccessible(true);
+        $updated = $method->invoke($plugin, $io, $source, $dest, 'code-review-guardian.sh', true);
+
+        $this->assertTrue($updated);
+        $this->assertSame(file_get_contents($source), file_get_contents($dest));
+        $this->removeDirectory($tempDir);
+    }
+
+    public function testIsAutoUpdateWrapperEnabledReturnsFalseWhenComposerJsonMissing(): void
+    {
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        mkdir($vendorDir, 0777, true);
+
+        $config = $this->createMock(Config::class);
+        $config->method('get')->with('vendor-dir')->willReturn($vendorDir);
+        $composer = $this->createMock(Composer::class);
+        $composer->method('getConfig')->willReturn($config);
+        $io = $this->createMock(IOInterface::class);
+
+        $plugin = new Plugin();
+        $plugin->activate($composer, $io);
+
+        $reflection = new \ReflectionClass($plugin);
+        $method = $reflection->getMethod('isAutoUpdateWrapperEnabled');
+        $method->setAccessible(true);
+
+        $this->assertFalse($method->invoke($plugin));
+        $this->removeDirectory($tempDir);
+    }
+
+    public function testOnPostInstallLeavesDifferingWrapperAndContinues(): void
+    {
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
+        $binDir = $packageDir.'/bin';
+        $configDir = $packageDir.'/config/generic';
+        mkdir($binDir, 0777, true);
+        mkdir($configDir, 0777, true);
+        mkdir($packageDir.'/docs', 0777, true);
+
+        file_put_contents($binDir.'/code-review-guardian.sh', "#!/bin/sh\necho \"package\"\n");
+        file_put_contents($tempDir.'/code-review-guardian.sh', "#!/bin/sh\necho \"local\"\n");
+        file_put_contents($configDir.'/code-review-guardian.yaml', "framework: generic\n");
+        file_put_contents($tempDir.'/composer.json', json_encode(['name' => 'test/package'], \JSON_PRETTY_PRINT));
+
+        $config = $this->createMock(Config::class);
+        $config->method('get')->with('vendor-dir')->willReturn($vendorDir);
+        $composer = $this->createMock(Composer::class);
+        $composer->method('getConfig')->willReturn($config);
+        $io = $this->createMock(IOInterface::class);
+        $io->expects($this->atLeastOnce())
+            ->method('write')
+            ->with($this->logicalOr(
+                $this->stringContains('Detected framework'),
+                $this->stringContains('differs from the package version'),
+                $this->stringContains('Installing'),
+                $this->stringContains('Updating'),
+                $this->stringContains('.gitignore'),
+                $this->anything(),
+            ));
+
+        $event = $this->createMock(Event::class);
+        $event->method('getIO')->willReturn($io);
+
+        $plugin = new Plugin();
+        $plugin->activate($composer, $io);
+        $plugin->onPostInstall($event);
+
+        $this->assertSame("#!/bin/sh\necho \"local\"\n", file_get_contents($tempDir.'/code-review-guardian.sh'));
+        $this->removeDirectory($tempDir);
+    }
+
+    public function testRemoveGitignoreEntriesRemovesStandaloneEntries(): void
+    {
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        mkdir($vendorDir, 0777, true);
+        file_put_contents($tempDir.'/.gitignore', "vendor/\ncode-review-guardian.sh\ncode-review-guardian.yaml\n");
+
+        $config = $this->createMock(Config::class);
+        $config->method('get')->with('vendor-dir')->willReturn($vendorDir);
+        $composer = $this->createMock(Composer::class);
+        $composer->method('getConfig')->willReturn($config);
+        $io = $this->createMock(IOInterface::class);
+
+        $plugin = new Plugin();
+        $plugin->activate($composer, $io);
+        $plugin->uninstall($composer, $io);
+
+        $remaining = file_get_contents($tempDir.'/.gitignore');
+        $this->assertIsString($remaining);
+        $this->assertStringNotContainsString('code-review-guardian.sh', $remaining);
+        $this->assertStringContainsString('vendor/', $remaining);
+
+        @unlink($tempDir.'/.gitignore');
+        @rmdir($vendorDir);
+        @rmdir($tempDir);
+    }
+
+    public function testInstallFrameworkConfigWithForceUpdateShowsUpdatingMessage(): void
+    {
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
+        $configSymfonyDir = $packageDir.'/config/symfony';
+        mkdir($configSymfonyDir, 0777, true);
+
+        file_put_contents($tempDir.'/code-review-guardian.yaml', 'old: config');
+        file_put_contents($configSymfonyDir.'/code-review-guardian.yaml', 'new: config');
+
+        $config = $this->createMock(Config::class);
+        $config->method('get')->with('vendor-dir')->willReturn($vendorDir);
+        $composer = $this->createMock(Composer::class);
+        $composer->method('getConfig')->willReturn($config);
+        $io = $this->createMock(IOInterface::class);
+        $io->expects($this->atLeastOnce())
+            ->method('write')
+            ->with($this->stringContains('Updating code-review-guardian.yaml'));
+
+        $plugin = new Plugin();
+        $plugin->activate($composer, $io);
+
+        $reflection = new \ReflectionClass($plugin);
+        $method = $reflection->getMethod('installFrameworkConfig');
+        $method->setAccessible(true);
+        $method->invoke($plugin, $packageDir, $tempDir, 'symfony', $io, true);
+
+        $this->removeDirectory($tempDir);
+    }
+
+    public function testInstallDocumentationFilesWithForceUpdateShowsUpdatingMessage(): void
+    {
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
+        $configSymfonyDir = $packageDir.'/config/symfony';
+        $docsSourceDir = $packageDir.'/docs';
+        mkdir($configSymfonyDir, 0777, true);
+        mkdir($docsSourceDir, 0777, true);
+        mkdir($tempDir.'/docs', 0777, true);
+
+        file_put_contents($configSymfonyDir.'/AGENTS.md', '# New AGENTS');
+        file_put_contents($docsSourceDir.'/GGA.md', '# New GGA');
+        file_put_contents($tempDir.'/docs/AGENTS.md', '# Old AGENTS');
+        file_put_contents($tempDir.'/docs/GGA.md', '# Old GGA');
+        file_put_contents($tempDir.'/composer.json', json_encode(['require' => ['symfony/framework-bundle' => '^6.0']], \JSON_PRETTY_PRINT));
+
+        $config = $this->createMock(Config::class);
+        $config->method('get')->with('vendor-dir')->willReturn($vendorDir);
+        $composer = $this->createMock(Composer::class);
+        $composer->method('getConfig')->willReturn($config);
+        $io = $this->createMock(IOInterface::class);
+        $io->expects($this->atLeastOnce())
+            ->method('write')
+            ->with($this->logicalOr(
+                $this->stringContains('Updating AGENTS.md'),
+                $this->stringContains('Updating GGA.md'),
+            ));
+
+        $plugin = new Plugin();
+        $plugin->activate($composer, $io);
+
+        $reflection = new \ReflectionClass($plugin);
+        $method = $reflection->getMethod('installDocumentationFiles');
+        $method->setAccessible(true);
+        $method->invoke($plugin, $packageDir, $tempDir, $io, true);
+
+        $this->removeDirectory($tempDir);
+    }
+
+    public function testUninstallRemovesTrailingEmptyLinesFromGitignore(): void
+    {
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        mkdir($vendorDir, 0777, true);
+
+        file_put_contents($tempDir.'/.gitignore', "# Code Review Guardian\ncode-review-guardian.sh\ncode-review-guardian.yaml\n\n\n");
+
+        $config = $this->createMock(Config::class);
+        $config->method('get')->with('vendor-dir')->willReturn($vendorDir);
+        $composer = $this->createMock(Composer::class);
+        $composer->method('getConfig')->willReturn($config);
+        $io = $this->createMock(IOInterface::class);
+
+        $plugin = new Plugin();
+        $plugin->activate($composer, $io);
+        $plugin->uninstall($composer, $io);
+
+        $remaining = file_get_contents($tempDir.'/.gitignore');
+        $this->assertIsString($remaining);
+        $this->assertStringNotContainsString('code-review-guardian.sh', $remaining);
+        $this->assertSame(rtrim($remaining), trim($remaining));
+
+        @unlink($tempDir.'/.gitignore');
+        @rmdir($vendorDir);
+        @rmdir($tempDir);
+    }
+
+    public function testInstallFrameworkConfigSkipsMissingSourceFiles(): void
+    {
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
+        mkdir($packageDir.'/config/generic', 0777, true);
+
+        $config = $this->createMock(Config::class);
+        $config->method('get')->with('vendor-dir')->willReturn($vendorDir);
+        $composer = $this->createMock(Composer::class);
+        $composer->method('getConfig')->willReturn($config);
+        $io = $this->createMock(IOInterface::class);
+        $io->expects($this->never())->method('write');
+
+        $plugin = new Plugin();
+        $plugin->activate($composer, $io);
+
+        $reflection = new \ReflectionClass($plugin);
+        $method = $reflection->getMethod('installFrameworkConfig');
+        $method->setAccessible(true);
+        $method->invoke($plugin, $packageDir, $tempDir, 'generic', $io, false);
+
+        $this->assertFileDoesNotExist($tempDir.'/code-review-guardian.yaml');
+        $this->removeDirectory($tempDir);
+    }
+
+    public function testInstallDocumentationFilesSkipsExistingWithoutForceUpdate(): void
+    {
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
+        $configGenericDir = $packageDir.'/config/generic';
+        $docsSourceDir = $packageDir.'/docs';
+        mkdir($configGenericDir, 0777, true);
+        mkdir($docsSourceDir, 0777, true);
+        mkdir($tempDir.'/docs', 0777, true);
+
+        file_put_contents($configGenericDir.'/AGENTS.md', '# New AGENTS');
+        file_put_contents($docsSourceDir.'/GGA.md', '# New GGA');
+        file_put_contents($tempDir.'/docs/AGENTS.md', '# Keep AGENTS');
+        file_put_contents($tempDir.'/docs/GGA.md', '# Keep GGA');
+        file_put_contents($tempDir.'/composer.json', json_encode(['name' => 'test/package'], \JSON_PRETTY_PRINT));
+
+        $config = $this->createMock(Config::class);
+        $config->method('get')->with('vendor-dir')->willReturn($vendorDir);
+        $composer = $this->createMock(Composer::class);
+        $composer->method('getConfig')->willReturn($config);
+        $io = $this->createMock(IOInterface::class);
+        $io->expects($this->never())->method('write');
+
+        $plugin = new Plugin();
+        $plugin->activate($composer, $io);
+
+        $reflection = new \ReflectionClass($plugin);
+        $method = $reflection->getMethod('installDocumentationFiles');
+        $method->setAccessible(true);
+        $method->invoke($plugin, $packageDir, $tempDir, $io, false);
+
+        $this->assertSame('# Keep AGENTS', file_get_contents($tempDir.'/docs/AGENTS.md'));
+        $this->assertSame('# Keep GGA', file_get_contents($tempDir.'/docs/GGA.md'));
+        $this->removeDirectory($tempDir);
+    }
+
+    public function testUpdateGitignoreSkipsWhenGitignorePathIsDirectory(): void
+    {
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        mkdir($vendorDir, 0777, true);
+        mkdir($tempDir.'/.gitignore', 0777, true);
+
+        $config = $this->createMock(Config::class);
+        $config->method('get')->with('vendor-dir')->willReturn($vendorDir);
+        $composer = $this->createMock(Composer::class);
+        $composer->method('getConfig')->willReturn($config);
+        $io = $this->createMock(IOInterface::class);
+        $io->expects($this->never())->method('write');
+
+        $plugin = new Plugin();
+        $plugin->activate($composer, $io);
+
+        $reflection = new \ReflectionClass($plugin);
+        $method = $reflection->getMethod('updateGitignore');
+        $method->setAccessible(true);
+        $method->invoke($plugin, $tempDir, $io);
+
+        $this->assertDirectoryExists($tempDir.'/.gitignore');
+        $this->removeDirectory($tempDir);
+    }
+
+    public function testRemoveGitignoreEntriesSkipsWhenGitignorePathIsDirectory(): void
+    {
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        mkdir($vendorDir, 0777, true);
+        mkdir($tempDir.'/.gitignore', 0777, true);
+
+        $config = $this->createMock(Config::class);
+        $config->method('get')->with('vendor-dir')->willReturn($vendorDir);
+        $composer = $this->createMock(Composer::class);
+        $composer->method('getConfig')->willReturn($config);
+        $io = $this->createMock(IOInterface::class);
+
+        $plugin = new Plugin();
+        $plugin->activate($composer, $io);
+
+        $reflection = new \ReflectionClass($plugin);
+        $method = $reflection->getMethod('removeGitignoreEntries');
+        $method->setAccessible(true);
+        $method->invoke($plugin, $tempDir, $io);
+
+        $this->assertDirectoryExists($tempDir.'/.gitignore');
+        $this->removeDirectory($tempDir);
+    }
+
+    public function testReadProjectComposerJsonReturnsEmptyWhenComposerJsonIsDirectory(): void
+    {
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        mkdir($vendorDir, 0777, true);
+        mkdir($tempDir.'/composer.json', 0777, true);
+
+        $config = $this->createMock(Config::class);
+        $config->method('get')->with('vendor-dir')->willReturn($vendorDir);
+        $composer = $this->createMock(Composer::class);
+        $composer->method('getConfig')->willReturn($config);
+        $io = $this->createMock(IOInterface::class);
+
+        $plugin = new Plugin();
+        $plugin->activate($composer, $io);
+
+        $reflection = new \ReflectionClass($plugin);
+        $method = $reflection->getMethod('readProjectComposerJson');
+        $method->setAccessible(true);
+
+        $this->assertSame([], $method->invoke($plugin));
         $this->removeDirectory($tempDir);
     }
 

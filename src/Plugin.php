@@ -87,7 +87,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public function onPostInstall(Event $event): void
     {
-        // Script file (.sh) will always be updated, config files only if they don't exist
+        // Script file (.sh) is installed when missing; overwrite only with opt-in
         $this->installFiles($event->getIO(), false);
     }
 
@@ -98,13 +98,13 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public function onPostUpdate(Event $event): void
     {
-        // Script file (.sh) will always be updated, config files only if they don't exist
+        // Script file (.sh) is installed when missing; overwrite only with opt-in
         $this->installFiles($event->getIO(), false);
     }
 
     /**
      * Install or update Code Review Guardian assets in the consuming project.
-     * - `code-review-guardian.sh` is always copied from the package (latest wrapper on every install/update).
+     * - `code-review-guardian.sh` is installed when missing; skipped when checksums match; overwritten only with `$forceUpdate` or `extra.code-review-guardian.auto_update_wrapper`.
      * - `code-review-guardian.yaml` is copied only if missing (unless $forceUpdate).
      * - `docs/AGENTS.md` and `docs/GGA.md` are installed under docs/ only if missing (unless $forceUpdate).
      * - `.gitignore` is updated to list the root script and YAML (not the docs files).
@@ -130,9 +130,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
         $io->write(\sprintf('<info>Detected framework: %s</info>', strtoupper($framework)));
 
-        // Install code review script
-        // Note: The .sh script is ALWAYS updated to ensure users have the latest version
-        // This is different from config files which are only installed if they don't exist
+        // Install code review script (opt-in overwrite when the file already exists)
         $files = [
             'bin/code-review-guardian.sh' => 'code-review-guardian.sh',
         ];
@@ -146,16 +144,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
                 continue;
             }
 
-            // Always update the script file, regardless of $forceUpdate flag
-            // This ensures users always have the latest version with bug fixes and new features
-            if (file_exists($destPath)) {
-                $io->write(\sprintf('<info>Updating %s</info>', $dest));
-            } else {
-                $io->write(\sprintf('<info>Installing %s</info>', $dest));
+            if (!$this->installOrUpdateWrapperScript($io, $sourcePath, $destPath, $dest, $forceUpdate)) {
+                continue;
             }
-
-            copy($sourcePath, $destPath);
-            chmod($destPath, $this->getChmodMode());
         }
 
         // Install framework-specific configuration files
@@ -268,10 +259,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         foreach ($docFiles as $sourcePath => $dest) {
             $destPath = $docsDestDir.'/'.$dest;
 
-            if (!file_exists($sourcePath)) {
-                continue;
-            }
-
             // Only install if file doesn't exist (don't overwrite user's documentation)
             if (file_exists($destPath) && !$forceUpdate) {
                 continue;
@@ -304,12 +291,17 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $content = '';
         $lines = [];
 
-        if (file_exists($gitignorePath)) {
+        if (is_file($gitignorePath)) {
             $content = file_get_contents($gitignorePath);
+            // @codeCoverageIgnoreStart
             if (false === $content) {
                 $content = '';
             }
+            // @codeCoverageIgnoreEnd
             $lines = explode("\n", $content);
+        } elseif (file_exists($gitignorePath)) {
+            // Path exists but is not a regular file (e.g. a directory).
+            return;
         }
 
         $updated = false;
@@ -407,14 +399,16 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     {
         $gitignorePath = $projectDir.'/.gitignore';
 
-        if (!file_exists($gitignorePath)) {
+        if (!is_file($gitignorePath)) {
             return;
         }
 
         $content = file_get_contents($gitignorePath);
+        // @codeCoverageIgnoreStart
         if (false === $content) {
             return;
         }
+        // @codeCoverageIgnoreEnd
 
         $lines = explode("\n", $content);
 
@@ -466,5 +460,78 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             file_put_contents($gitignorePath, implode("\n", $newLines)."\n");
             $io->write(' <info>✓</info>');
         }
+    }
+
+    /**
+     * Copies the wrapper script on first install; overwrites only when opt-in or $forceUpdate.
+     *
+     * @return bool True when the file was installed or updated
+     */
+    private function installOrUpdateWrapperScript(
+        IOInterface $io,
+        string $sourcePath,
+        string $destPath,
+        string $destName,
+        bool $forceUpdate,
+    ): bool {
+        if (!file_exists($destPath)) {
+            $io->write(\sprintf('<info>Installing %s</info>', $destName));
+            copy($sourcePath, $destPath);
+            chmod($destPath, $this->getChmodMode());
+
+            return true;
+        }
+
+        if (md5_file($sourcePath) === md5_file($destPath)) {
+            return false;
+        }
+
+        if ($forceUpdate || $this->isAutoUpdateWrapperEnabled()) {
+            $io->write(\sprintf('<info>Updating %s</info>', $destName));
+            copy($sourcePath, $destPath);
+            chmod($destPath, $this->getChmodMode());
+
+            return true;
+        }
+
+        $io->write(\sprintf(
+            '<comment>%s differs from the package version (local MD5: %s, package MD5: %s). Set extra.code-review-guardian.auto_update_wrapper to true in composer.json to overwrite.</comment>',
+            $destName,
+            md5_file($destPath),
+            md5_file($sourcePath),
+        ));
+
+        return false;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function readProjectComposerJson(): array
+    {
+        $vendorDir = $this->composer->getConfig()->get('vendor-dir');
+        $composerJsonPath = \dirname((string) $vendorDir).'/composer.json';
+
+        if (!is_file($composerJsonPath)) {
+            return [];
+        }
+
+        $content = file_get_contents($composerJsonPath);
+        // @codeCoverageIgnoreStart
+        if (false === $content) {
+            return [];
+        }
+        // @codeCoverageIgnoreEnd
+
+        $decoded = json_decode($content, true);
+
+        return \is_array($decoded) ? $decoded : [];
+    }
+
+    private function isAutoUpdateWrapperEnabled(): bool
+    {
+        $extra = $this->readProjectComposerJson()['extra'] ?? [];
+
+        return (bool) ($extra['code-review-guardian']['auto_update_wrapper'] ?? false);
     }
 }

@@ -62,7 +62,7 @@
     "extra": {
         "class": "NowoTech\\CodeReviewGuardian\\Plugin",
         "branch-alias": {
-            "dev-main": "0.0.1-dev"
+            "dev-main": "1.1.x-dev"
         }
     },
     "scripts": {

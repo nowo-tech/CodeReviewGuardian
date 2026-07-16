@@ -131,6 +131,19 @@ final class FrameworkDetectorTest extends TestCase
         $this->assertEquals(FrameworkDetector::FRAMEWORK_GENERIC, $framework);
     }
 
+    public function testDetectUnreadableComposerJsonReturnsGeneric(): void
+    {
+        $composerJsonPath = sys_get_temp_dir().'/code-review-guardian-dir-'.uniqid();
+        mkdir($composerJsonPath, 0777, true);
+
+        try {
+            $framework = FrameworkDetector::detect($composerJsonPath);
+            $this->assertEquals(FrameworkDetector::FRAMEWORK_GENERIC, $framework);
+        } finally {
+            @rmdir($composerJsonPath);
+        }
+    }
+
     public function testDetectWithInvalidJson(): void
     {
         $composerJsonPath = __DIR__.'/../fixtures/composer-invalid.json';
@@ -203,6 +216,18 @@ final class FrameworkDetectorTest extends TestCase
     public function testGetConfigDirectoryWithUnknownFramework(): void
     {
         $this->assertEquals('generic', FrameworkDetector::getConfigDirectory('unknown-framework'));
+    }
+
+    public function testDetectReturnsGenericWhenComposerJsonIsUnreadableDirectory(): void
+    {
+        $composerJsonPath = sys_get_temp_dir().'/code-review-guardian-detector-'.uniqid();
+        mkdir($composerJsonPath, 0777, true);
+
+        $framework = FrameworkDetector::detect($composerJsonPath);
+
+        $this->assertEquals(FrameworkDetector::FRAMEWORK_GENERIC, $framework);
+
+        rmdir($composerJsonPath);
     }
 
     /**

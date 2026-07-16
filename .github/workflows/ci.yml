@@ -1,3 +1,4 @@
+# CI: tests on PHP × Symfony 7.4, 8.0, 8.1 (minimum minors per REQ-SF-002).
 name: CI
 
 on:
@@ -7,15 +8,38 @@ on:
     branches: [main, master]
 
 jobs:
+  git-hygiene:
+    name: Git history (no Cursor co-author)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Check for Cursor co-author trailers (REQ-GIT-001)
+        run: |
+          chmod +x .scripts/check-no-cursor-coauthor.sh
+          ./.scripts/check-no-cursor-coauthor.sh HEAD
+
   test:
-    name: PHP ${{ matrix.php }} - ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+    name: PHP ${{ matrix.php }} - Symfony ${{ matrix.symfony }}
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
-        php: ['8.1', '8.2', '8.3']
+        php: ['8.2', '8.3', '8.4', '8.5']
+        symfony: ['7.4', '8.0', '8.1']
+        exclude:
+          - php: '8.2'
+            symfony: '8.0'
+          - php: '8.2'
+            symfony: '8.1'
+          - php: '8.3'
+            symfony: '8.0'
+          - php: '8.3'
+            symfony: '8.1'
 
     steps:
       - name: Checkout code
@@ -40,22 +64,25 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.json', '**/composer.lock') }}
+          key: ${{ runner.os }}-php-${{ matrix.php }}-symfony-${{ matrix.symfony }}-composer-${{ hashFiles('**/composer.json', '**/composer.lock') }}
           restore-keys: |
+            ${{ runner.os }}-php-${{ matrix.php }}-symfony-${{ matrix.symfony }}-composer-
             ${{ runner.os }}-php-${{ matrix.php }}-composer-
 
-      - name: Install dependencies
-        run: composer install --prefer-dist --no-progress
+      - name: Install dependencies with Symfony ${{ matrix.symfony }}
+        run: |
+          composer require symfony/framework-bundle:^${{ matrix.symfony }} --no-interaction --no-update
+          composer update symfony/* --with-all-dependencies --no-interaction --prefer-dist --no-progress
 
       - name: Run tests
         run: composer test
 
-      - name: Run tests with coverage (PHP 8.2 only)
-        if: matrix.php == '8.2'
+      - name: Run tests with coverage (PHP 8.2 + Symfony 7.4 only)
+        if: matrix.php == '8.2' && matrix.symfony == '7.4'
         run: composer test-coverage
 
-      - name: Validate coverage file (PHP 8.2 only)
-        if: matrix.php == '8.2'
+      - name: Validate coverage file (PHP 8.2 + Symfony 7.4 only)
+        if: matrix.php == '8.2' && matrix.symfony == '7.4'
         run: test -f coverage.xml
 
   code-style-check:

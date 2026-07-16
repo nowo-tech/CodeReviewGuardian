@@ -1,5 +1,7 @@
 # Engram (MCP)
 
+Repository-local **product spec** and **`REQ-*`** traceability (Makefiles, demos) are described in [Spec-driven development](SPEC-DRIVEN-DEVELOPMENT.md).
+
 This repository versions [`.cursor/mcp.json`](../.cursor/mcp.json) so Cursor can use the **engram** MCP server:
 
 ```json
