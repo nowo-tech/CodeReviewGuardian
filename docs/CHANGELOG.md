@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-07-22
+
+### Fixed
+
+- **GitHub Release workflow** — `make_latest` is now sent as a string (`"true"` / `"false"`) so `release.yml` / `sync-releases.yml` no longer fail with HTTP 422 when creating or updating releases.
+
+### Changed
+
+- **CI dependencies** — Bumped GitHub Actions: `actions/checkout` 4→7, `actions/cache` 4→6, `actions/github-script` 7→9.
+
+### Documentation
+
+- **UPGRADING** — Corrected the general upgrade notes: YAML is install-if-missing; wrapper overwrite remains opt-in since 1.1.0.
+
 ## [1.1.0] - 2026-07-16
 
 ### Added

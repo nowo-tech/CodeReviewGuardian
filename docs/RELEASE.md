@@ -8,6 +8,8 @@ This package follows semantic versioning. Git tags use the `v*` prefix (for exam
 
 Pushing a `v*` tag triggers `.github/workflows/release.yml`, which creates a GitHub Release using the annotated tag message when present.
 
+If a release is missing for an existing tag, run `.github/workflows/sync-releases.yml` (workflow dispatch) or create it with `gh release create`.
+
 ## Before tagging
 
 - Update [CHANGELOG.md](CHANGELOG.md) with user-facing changes.

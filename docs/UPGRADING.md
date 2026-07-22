@@ -13,14 +13,26 @@ This guide will help you upgrade Code Review Guardian to newer versions.
    Check [CHANGELOG.md](CHANGELOG.md) for breaking changes and new features.
 
 3. **Update your configuration** (if needed):
-   The `code-review-guardian.yaml` configuration file is automatically updated during installation.
-   If you have custom modifications, you may need to review and update them.
+   `code-review-guardian.yaml` is installed only when missing (existing files are preserved).
+   If you have custom modifications, compare against the package templates under `vendor/nowo-tech/code-review-guardian/config/`.
 
 4. **Update the script** (if needed):
-   The `code-review-guardian.sh` script is automatically updated during installation.
-   If you have custom modifications, you may need to reapply them.
+   From 1.1.0, `code-review-guardian.sh` is installed when missing and is **not** overwritten by default if it differs from the package.
+   Enable `extra.code-review-guardian.auto_update_wrapper` (see [Upgrading to 1.1.0](#upgrading-to-110)) if you want automatic overwrite.
 
 ## Version-Specific Upgrade Notes
+
+### Upgrading to 1.1.1
+
+Patch release for CI/release tooling. No package behavior changes for consumers.
+
+#### What You Need to Do
+
+**No action required.** Update when convenient:
+
+```bash
+composer update nowo-tech/code-review-guardian
+```
 
 ### Upgrading to 1.1.0
 

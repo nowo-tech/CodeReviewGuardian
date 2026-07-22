@@ -192,7 +192,7 @@ jobs:
                 release_id: releaseId,
                 body: releaseBody,
                 prerelease: isPrerelease,
-                make_latest: !isPrerelease  // Mark as latest if not prerelease
+                make_latest: isPrerelease ? 'false' : 'true'  // API expects string, not boolean
               });
               if (hasChangelog && changelogEntry) {
                 console.log('✅ Updated release ' + tagName + ' with complete changelog');
@@ -202,7 +202,7 @@ jobs:
 
               // Verify latest status
               if (!isPrerelease) {
-                console.log('✅ Release ' + tagName + ' marked as latest (make_latest: true)');
+                console.log('✅ Release ' + tagName + ' marked as latest (make_latest: "true")');
               }
             } catch (error) {
               console.error('❌ Error updating release ' + tagName + ':', error.message);
@@ -255,7 +255,7 @@ jobs:
                 body: releaseBody,
                 draft: false,
                 prerelease: isPrerelease,
-                make_latest: !isPrerelease,  // Explicitly mark as latest if not prerelease
+                make_latest: isPrerelease ? 'false' : 'true',  // API expects string, not boolean
                 generate_release_notes: false  // Don't generate auto notes, we have our own changelog
               });
               if (hasChangelog && changelogEntry) {
