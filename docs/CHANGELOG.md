@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-07-22
+
+### Fixed
+
+- **CI Composer install** — With `composer.lock` gitignored, the matrix job now runs a full `composer update` (not a partial `symfony/*` update) and pins `symfony/framework-bundle` with `--dev` so it stays in `require-dev`.
+- **CI `platform.php`** — Unsets `config.platform.php` (pinned to `8.1.0` for local Docker) before resolving dependencies so Symfony 7.4 / 8.x install against the matrix PHP version.
+
+### Documentation
+
+- **UPGRADING** — Notes for 1.1.2 (no consumer action required).
+
 ## [1.1.1] - 2026-07-22
 
 ### Fixed

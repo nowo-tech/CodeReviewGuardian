@@ -22,6 +22,18 @@ This guide will help you upgrade Code Review Guardian to newer versions.
 
 ## Version-Specific Upgrade Notes
 
+### Upgrading to 1.1.2
+
+Patch release for CI Composer resolution only. No package behavior changes for consumers.
+
+#### What You Need to Do
+
+**No action required.** Update when convenient:
+
+```bash
+composer update nowo-tech/code-review-guardian
+```
+
 ### Upgrading to 1.1.1
 
 Patch release for CI/release tooling. No package behavior changes for consumers.
