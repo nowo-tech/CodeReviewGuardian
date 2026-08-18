@@ -3,6 +3,7 @@
     "description": "Provider-agnostic code review guardian for PHP projects. Works with any PHP project (Symfony, Laravel, Yii, CodeIgniter, etc.) and any Git provider (GitHub, GitLab, Bitbucket, etc.)",
     "type": "composer-plugin",
     "license": "MIT",
+    "abandoned": true,
     "keywords": [
         "code-review",
         "code-quality",
@@ -39,10 +40,11 @@
     },
     "require-dev": {
         "composer/composer": "^2.0",
-        "phpunit/phpunit": "^9.6 || ^10.0 || ^11.0",
         "friendsofphp/php-cs-fixer": "^3.0",
+        "nowo-tech/phpstan-frankenphp": "^1.0",
         "phpstan/phpstan": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
+        "phpunit/phpunit": "^9.6 || ^10.0 || ^11.0",
         "rector/rector": "^2.0",
         "symfony/framework-bundle": "^6.0 || ^7.0 || ^8.0"
     },
@@ -106,4 +108,3 @@
         ]
     }
 }
-

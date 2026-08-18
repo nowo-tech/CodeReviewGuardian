@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.3] - 2026-08-18
+
+### Changed
+
+- Package marked **abandoned** (`"abandoned": true` in `composer.json`); no further maintenance planned. Prefer Git-host review tooling and project-local CI.
+- **PHPStan:** drop `phpstan-baseline.neon`; include `nowo-tech/phpstan-frankenphp` classic + worker rulesets.
+- **PHP-CS-Fixer:** enable `fully_qualified_strict_types.import_symbols`.
+- **Makefile:** Compose V2 with V1 fallback, `down-dev`, optional `-include` of the monorepo `update-deps` helper (REQ-MAKE-009 / REQ-MAKE-010).
+
+### Tests
+
+- Plugin tests use `readRequiredFile()` instead of unchecked `file_get_contents()`.
+
 ## [1.1.2] - 2026-07-22
 
 ### Fixed

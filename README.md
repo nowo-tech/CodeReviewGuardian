@@ -4,31 +4,7 @@
 
 > ⭐ **Found this useful?** Install from [Packagist](https://packagist.org/packages/nowo-tech/code-review-guardian) and give the repository a star on [GitHub](https://github.com/nowo-tech/CodeReviewGuardian) if it helps your workflow.
 
-## Documentation
-
-
-- [GitHub Actions CI requirements](docs/GITHUB_CI.md)
-- [Installation](docs/INSTALLATION.md)
-- [Configuration](docs/CONFIGURATION.md)
-- [Usage](docs/USAGE.md)
-- [Contributing](docs/CONTRIBUTING.md)
-- [Code of Conduct](CODE_OF_CONDUCT.md)
-- [Changelog](docs/CHANGELOG.md)
-- [Upgrading](docs/UPGRADING.md)
-- [Release](docs/RELEASE.md)
-- [Security](docs/SECURITY.md)
-- [Engram](docs/ENGRAM.md)
-- [Spec-driven development](docs/SPEC-DRIVEN-DEVELOPMENT.md)
-- [GitHub Spec Kit](docs/SPEC-KIT.md)
-
-### Additional documentation
-
-- [Token setup](docs/TOKEN_SETUP.md)
-- [Git Guardian Angel (GGA)](docs/GGA.md)
-- [AI agents configuration](docs/AGENTS_CONFIG.md)
-- [Branching strategy](docs/BRANCHING.md)
-
-Provider-agnostic code review guardian for PHP projects. Works with any PHP project: **Symfony**, **Laravel**, **Yii**, **CodeIgniter**, **Slim**, **Laminas**, etc. and any Git provider: **GitHub**, **GitLab**, **Bitbucket**, etc.
+> **Abandoned** — This package is no longer maintained. Prefer your Git host’s native review tooling and project-local CI checks. Packagist marks `nowo-tech/code-review-guardian` as abandoned (`composer.json` → `"abandoned": true`).
 
 ## Features
 
@@ -44,6 +20,10 @@ Provider-agnostic code review guardian for PHP projects. Works with any PHP proj
 - ✅ **Provider-agnostic**: Works with GitHub, GitLab, Bitbucket, and any Git hosting service
 - ✅ Automatic installation via Composer plugin
 - ✅ **Configurable**: Easy configuration via YAML file
+
+## Version information
+
+Supported PHP ranges and dependencies are defined in [`composer.json`](composer.json). Release history and migration notes are in [`docs/CHANGELOG.md`](docs/CHANGELOG.md).
 
 ## Installation
 
@@ -81,65 +61,11 @@ GIT_TOKEN=your_github_or_gitlab_token_here
 
 See [`docs/TOKEN_SETUP.md`](docs/TOKEN_SETUP.md) for detailed step-by-step instructions on creating accounts and obtaining tokens for GitHub, GitLab, and Bitbucket.
 
-## Current Status
+## Requirements
 
-Code Review Guardian provides a complete infrastructure for code review automation:
-
-- ✅ **Fully Implemented:**
- - Composer plugin (automatic installation)
- - Automatic framework detection
- - Configuration file installation
- - Dependency validation script
- - YAML configuration parsing and loading
- - File filtering according to configured patterns
- - Rules file reading (AGENTS.md)
-
-- 🚧 **In Development:**
- - Full integration with AI APIs (OpenAI, Anthropic, GitHub Copilot)
- - Actual code review execution using AI models
- - Automatic comment posting to PR/MR
- - Automatic Git provider detection from URL
-
-The script currently validates configuration, filters files correctly, and is ready for AI API integration. Full review functionality is under active development.
-
-## Usage
-
-### Run code review
-
-```bash
-./code-review-guardian.sh
-```
-
-This will validate configuration, filter files according to your settings, and prepare for code review. Full AI-powered review integration is in active development.
-
-### Post review comment to PR/MR
-
-```bash
-./code-review-guardian.sh --post-comment
-```
-
-This functionality is currently in development. It will post review comments to your pull request or merge request using the Git provider API once fully implemented.
-
-### Show help
-
-```bash
-./code-review-guardian.sh --help
-```
-
-## Framework Detection
-
-The package **automatically detects** your framework and installs the appropriate configuration:
-
-| Framework | Detection | Configuration |
-|-----------|-----------|---------------|
-| **Symfony** | `symfony/framework-bundle` | ✅ Symfony-specific |
-| **Laravel** | `laravel/framework` | ✅ Laravel-specific |
-| **Yii** | `yiisoft/yii2` or `yiisoft/yii` | ✅ Generic |
-| **CakePHP** | `cakephp/cakephp` | ✅ Generic |
-| **Laminas** | `laminas/laminas-mvc` | ✅ Generic |
-| **CodeIgniter** | `codeigniter4/framework` | ✅ Generic |
-| **Slim** | `slim/slim` | ✅ Generic |
-| **Other** | Not detected | ✅ Generic |
+- PHP >= 8.1 (see `composer.json` for the exact range)
+- Composer 2.x
+- Git
 
 ## Configuration
 
@@ -215,6 +141,65 @@ Code Review Guardian supports AI-powered code review agents:
 
 For detailed AI agent configuration instructions, see the package documentation in `vendor/nowo-tech/code-review-guardian/docs/AGENTS_CONFIG.md` or check the [Configuration Guide](docs/CONFIGURATION.md) in the repository.
 
+## Usage
+### Run code review
+
+```bash
+./code-review-guardian.sh
+```
+
+This will validate configuration, filter files according to your settings, and prepare for code review. Full AI-powered review integration is in active development.
+
+### Post review comment to PR/MR
+
+```bash
+./code-review-guardian.sh --post-comment
+```
+
+This functionality is currently in development. It will post review comments to your pull request or merge request using the Git provider API once fully implemented.
+
+### Show help
+
+```bash
+./code-review-guardian.sh --help
+```
+
+## Current Status
+
+Code Review Guardian provides a complete infrastructure for code review automation:
+
+- ✅ **Fully Implemented:**
+ - Composer plugin (automatic installation)
+ - Automatic framework detection
+ - Configuration file installation
+ - Dependency validation script
+ - YAML configuration parsing and loading
+ - File filtering according to configured patterns
+ - Rules file reading (AGENTS.md)
+
+- 🚧 **In Development:**
+ - Full integration with AI APIs (OpenAI, Anthropic, GitHub Copilot)
+ - Actual code review execution using AI models
+ - Automatic comment posting to PR/MR
+ - Automatic Git provider detection from URL
+
+The script currently validates configuration, filters files correctly, and is ready for AI API integration. Full review functionality is under active development.
+
+## Framework Detection
+
+The package **automatically detects** your framework and installs the appropriate configuration:
+
+| Framework | Detection | Configuration |
+|-----------|-----------|---------------|
+| **Symfony** | `symfony/framework-bundle` | ✅ Symfony-specific |
+| **Laravel** | `laravel/framework` | ✅ Laravel-specific |
+| **Yii** | `yiisoft/yii2` or `yiisoft/yii` | ✅ Generic |
+| **CakePHP** | `cakephp/cakephp` | ✅ Generic |
+| **Laminas** | `laminas/laminas-mvc` | ✅ Generic |
+| **CodeIgniter** | `codeigniter4/framework` | ✅ Generic |
+| **Slim** | `slim/slim` | ✅ Generic |
+| **Other** | Not detected | ✅ Generic |
+
 ## Git Provider Support
 
 Code Review Guardian is **provider-agnostic** and works with:
@@ -226,18 +211,7 @@ Code Review Guardian is **provider-agnostic** and works with:
 
 Git provider detection is planned for a future release. Currently, you can configure the provider manually in the configuration file.
 
-## Requirements
-
-- PHP >= 8.1 (see `composer.json` for the exact range)
-- Composer 2.x
-- Git
-
-## Version information
-
-Supported PHP ranges and dependencies are defined in [`composer.json`](composer.json). Release history and migration notes are in [`docs/CHANGELOG.md`](docs/CHANGELOG.md).
-
 ## Development
-
 ### Using Docker (Recommended)
 
 The project includes Docker configuration for easy development:
@@ -342,7 +316,6 @@ jobs:
 ```
 
 ## Related Packages
-
 ### Composer Update Helper
 
 Want to keep your dependencies up to date? Check out **[Composer Update Helper](https://github.com/nowo-tech/ComposerUpdateHelper)** - a perfect complement to Code Review Guardian:
@@ -361,9 +334,30 @@ Together with Code Review Guardian, you get a complete development workflow:
 1. **Composer Update Helper** keeps your dependencies up to date
 2. **Code Review Guardian** ensures code quality in your pull requests
 
-## Author
+## Documentation
 
-Created by [Héctor Franco Aceituno](https://github.com/HecFranco) at [Nowo.tech](https://nowo.tech)
+- [GitHub Actions CI requirements](docs/GITHUB_CI.md)
+- [Installation](docs/INSTALLATION.md)
+- [Configuration](docs/CONFIGURATION.md)
+- [Usage](docs/USAGE.md)
+- [Contributing](docs/CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Changelog](docs/CHANGELOG.md)
+- [Upgrading](docs/UPGRADING.md)
+- [Release](docs/RELEASE.md)
+- [Security](docs/SECURITY.md)
+- [Engram](docs/ENGRAM.md)
+- [Spec-driven development](docs/SPEC-DRIVEN-DEVELOPMENT.md)
+- [GitHub Spec Kit](docs/SPEC-KIT.md)
+
+### Additional documentation
+
+- [Token setup](docs/TOKEN_SETUP.md)
+- [Git Guardian Angel (GGA)](docs/GGA.md)
+- [AI agents configuration](docs/AGENTS_CONFIG.md)
+- [Branching strategy](docs/BRANCHING.md)
+
+Provider-agnostic code review guardian for PHP projects. Works with any PHP project: **Symfony**, **Laravel**, **Yii**, **CodeIgniter**, **Slim**, **Laminas**, etc. and any Git provider: **GitHub**, **GitLab**, **Bitbucket**, etc.
 
 ## Tests and coverage
 
@@ -375,4 +369,8 @@ Created by [Héctor Franco Aceituno](https://github.com/HecFranco) at [Nowo.tech
 ## License
 
 The MIT License (MIT). Please see [LICENSE](LICENSE) for more information.
+
+## Author
+
+Created by [Héctor Franco Aceituno](https://github.com/HecFranco) at [Nowo.tech](https://nowo.tech)
 

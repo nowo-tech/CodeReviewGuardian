@@ -22,6 +22,14 @@ This guide will help you upgrade Code Review Guardian to newer versions.
 
 ## Version-Specific Upgrade Notes
 
+### Upgrading to 1.1.3
+
+This package is **abandoned**. Packagist will show `nowo-tech/code-review-guardian` as abandoned after this tag. Prefer your Git host’s native review tooling and project-local CI. No runtime API change if you keep using 1.1.x for a while.
+
+```bash
+composer remove nowo-tech/code-review-guardian
+```
+
 ### Upgrading to 1.1.2
 
 Patch release for CI Composer resolution only. No package behavior changes for consumers.
