@@ -1,9 +1,10 @@
 # Code Review Guardian — root Makefile (Docker workflow)
 
-COMPOSE ?= docker compose
+# Prefer Compose V2 plugin (GitHub Actions / modern Docker Desktop); fall back to docker-compose V1 (REQ-MAKE-010).
+COMPOSE ?= $(shell docker compose version >/dev/null 2>&1 && echo "docker compose" || echo "docker-compose")
 SERVICE_PHP ?= php
 
-.PHONY: help ensure-up up down build shell install assets test test-coverage \
+.PHONY: help ensure-up up down down-dev build shell install assets test test-coverage \
 	check-no-cursor-coauthor strip-cursor-coauthor-from-history \
 	cs-check cs-fix rector rector-dry phpstan qa release-check composer-sync \
 	clean update validate setup-hooks
@@ -11,7 +12,7 @@ SERVICE_PHP ?= php
 help:
 	@echo "Code Review Guardian — make targets"
 	@echo ""
-	@echo "Container: up, down, build, shell"
+	@echo "Container: up, down, down-dev, build, shell"
 	@echo "Dependencies: install"
 	@echo "Assets: assets (no-op)"
 	@echo "Tests: test, test-coverage"
@@ -32,6 +33,10 @@ up:
 
 down:
 	@$(COMPOSE) down
+
+# Stop containers without removing volumes (REQ-MAKE-007)
+down-dev:
+	@$(COMPOSE) down --remove-orphans
 
 build:
 	@$(COMPOSE) build --no-cache
@@ -110,7 +115,8 @@ setup-hooks:
 
 # REQ-MAKE-008: update-deps (REQ-MAKE-008)
 BUNDLE_ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
-include $(BUNDLE_ROOT)/../.scripts/Makefile.update-deps.mk
+# Optional: monorepo helper absent on standalone GitHub Actions checkout (REQ-MAKE-009).
+-include $(BUNDLE_ROOT)/../.scripts/Makefile.update-deps.mk
 
 strip-cursor-coauthor-from-history:
 	@chmod +x .scripts/strip-cursor-coauthor-from-history.sh

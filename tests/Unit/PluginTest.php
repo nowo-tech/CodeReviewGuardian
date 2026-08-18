@@ -25,7 +25,6 @@ final class PluginTest extends TestCase
     {
         $events = Plugin::getSubscribedEvents();
 
-        $this->assertIsArray($events);
         $this->assertArrayHasKey(ScriptEvents::POST_INSTALL_CMD, $events);
         $this->assertArrayHasKey(ScriptEvents::POST_UPDATE_CMD, $events);
         $this->assertEquals('onPostInstall', $events[ScriptEvents::POST_INSTALL_CMD]);
@@ -38,10 +37,8 @@ final class PluginTest extends TestCase
         $composer = $this->createMock(Composer::class);
         $io = $this->createMock(IOInterface::class);
 
-        // Should not throw any exception
+        $this->expectNotToPerformAssertions();
         $plugin->activate($composer, $io);
-
-        $this->assertTrue(true);
     }
 
     public function testDeactivateDoesNothing(): void
@@ -50,10 +47,8 @@ final class PluginTest extends TestCase
         $composer = $this->createMock(Composer::class);
         $io = $this->createMock(IOInterface::class);
 
-        // Should not throw any exception
+        $this->expectNotToPerformAssertions();
         $plugin->deactivate($composer, $io);
-
-        $this->assertTrue(true);
     }
 
     public function testUninstallRemovesFiles(): void
@@ -208,7 +203,7 @@ final class PluginTest extends TestCase
         $plugin->onPostInstall($event);
 
         $this->assertFileExists($tempDir.'/code-review-guardian.yaml');
-        $content = file_get_contents($tempDir.'/code-review-guardian.yaml');
+        $content = $this->readRequiredFile($tempDir.'/code-review-guardian.yaml');
         $this->assertStringContainsString('laravel', $content);
 
         // Cleanup
@@ -263,7 +258,7 @@ final class PluginTest extends TestCase
         $plugin->onPostInstall($event);
 
         $this->assertFileExists($tempDir.'/code-review-guardian.yaml');
-        $content = file_get_contents($tempDir.'/code-review-guardian.yaml');
+        $content = $this->readRequiredFile($tempDir.'/code-review-guardian.yaml');
         $this->assertStringContainsString('generic', $content);
 
         // Cleanup
@@ -303,7 +298,7 @@ final class PluginTest extends TestCase
         $plugin->activate($composer, $io);
         $plugin->onPostInstall($event);
 
-        $gitignoreContent = file_get_contents($tempDir.'/.gitignore');
+        $gitignoreContent = $this->readRequiredFile($tempDir.'/.gitignore');
         $this->assertStringContainsString('code-review-guardian.sh', $gitignoreContent);
         $this->assertStringContainsString('code-review-guardian.yaml', $gitignoreContent);
         $this->assertStringContainsString('# Code Review Guardian', $gitignoreContent);
@@ -357,12 +352,12 @@ final class PluginTest extends TestCase
         $plugin->onPostInstall($event);
 
         // Verify existing config content was preserved (not overwritten)
-        $content = file_get_contents($tempDir.'/code-review-guardian.yaml');
+        $content = $this->readRequiredFile($tempDir.'/code-review-guardian.yaml');
         $this->assertEquals($existingContent, $content);
 
         // Verify script was updated (always updated, even if exists)
         $this->assertFileExists($tempDir.'/code-review-guardian.sh');
-        $scriptContent = file_get_contents($tempDir.'/code-review-guardian.sh');
+        $scriptContent = $this->readRequiredFile($tempDir.'/code-review-guardian.sh');
         $this->assertStringContainsString('new script', $scriptContent);
 
         // Cleanup
@@ -429,11 +424,11 @@ final class PluginTest extends TestCase
 
         // Verify script was updated
         $this->assertFileExists($tempDir.'/code-review-guardian.sh');
-        $updatedScriptContent = file_get_contents($tempDir.'/code-review-guardian.sh');
+        $updatedScriptContent = $this->readRequiredFile($tempDir.'/code-review-guardian.sh');
         $this->assertEquals($newScriptContent, $updatedScriptContent);
 
         // Verify .gitignore was updated
-        $gitignoreContent = file_get_contents($tempDir.'/.gitignore');
+        $gitignoreContent = $this->readRequiredFile($tempDir.'/.gitignore');
         $this->assertStringContainsString('code-review-guardian.sh', $gitignoreContent);
         $this->assertStringContainsString('code-review-guardian.yaml', $gitignoreContent);
 
@@ -697,7 +692,7 @@ final class PluginTest extends TestCase
         $plugin->onPostUpdate($event);
 
         $this->assertFileExists($tempDir.'/.gitignore');
-        $gitignoreContent = file_get_contents($tempDir.'/.gitignore');
+        $gitignoreContent = $this->readRequiredFile($tempDir.'/.gitignore');
         $this->assertStringContainsString('code-review-guardian.sh', $gitignoreContent);
         $this->assertStringContainsString('code-review-guardian.yaml', $gitignoreContent);
 
@@ -744,7 +739,7 @@ final class PluginTest extends TestCase
         $plugin->activate($composer, $io);
         $plugin->onPostUpdate($event);
 
-        $gitignoreContent = file_get_contents($tempDir.'/.gitignore');
+        $gitignoreContent = $this->readRequiredFile($tempDir.'/.gitignore');
         $this->assertStringContainsString('code-review-guardian.sh', $gitignoreContent);
         $this->assertStringContainsString('code-review-guardian.yaml', $gitignoreContent);
 
@@ -791,7 +786,7 @@ final class PluginTest extends TestCase
         $plugin->activate($composer, $io);
         $plugin->onPostUpdate($event);
 
-        $gitignoreContent = file_get_contents($tempDir.'/.gitignore');
+        $gitignoreContent = $this->readRequiredFile($tempDir.'/.gitignore');
         $this->assertStringContainsString('vendor/', $gitignoreContent);
         $this->assertStringContainsString('code-review-guardian.sh', $gitignoreContent);
 
@@ -850,7 +845,7 @@ final class PluginTest extends TestCase
         $plugin->onPostUpdate($event);
 
         // Content should remain the same
-        $finalContent = file_get_contents($tempDir.'/.gitignore');
+        $finalContent = $this->readRequiredFile($tempDir.'/.gitignore');
         $this->assertEquals($gitignoreContent, $finalContent);
 
         // Cleanup
@@ -896,7 +891,7 @@ final class PluginTest extends TestCase
         $plugin->activate($composer, $io);
         $plugin->onPostUpdate($event);
 
-        $gitignoreContent = file_get_contents($tempDir.'/.gitignore');
+        $gitignoreContent = $this->readRequiredFile($tempDir.'/.gitignore');
         $this->assertStringContainsString('code-review-guardian.sh', $gitignoreContent);
         $this->assertStringContainsString('code-review-guardian.yaml', $gitignoreContent);
 
@@ -984,7 +979,7 @@ final class PluginTest extends TestCase
         $plugin->activate($composer, $io);
         $plugin->uninstall($composer, $io);
 
-        $remainingContent = file_get_contents($tempDir.'/.gitignore');
+        $remainingContent = $this->readRequiredFile($tempDir.'/.gitignore');
         $this->assertStringNotContainsString('code-review-guardian.sh', $remainingContent);
         $this->assertStringNotContainsString('code-review-guardian.yaml', $remainingContent);
         $this->assertStringNotContainsString('# Code Review Guardian', $remainingContent);
@@ -1055,7 +1050,7 @@ final class PluginTest extends TestCase
 
         // Verify script was updated with new version
         $this->assertFileExists($tempDir.'/code-review-guardian.sh');
-        $updatedContent = file_get_contents($tempDir.'/code-review-guardian.sh');
+        $updatedContent = $this->readRequiredFile($tempDir.'/code-review-guardian.sh');
         $this->assertEquals($newScriptContent, $updatedContent);
 
         // Update source script again to simulate a package update
@@ -1066,7 +1061,7 @@ final class PluginTest extends TestCase
         $plugin->onPostUpdate($event);
 
         // Verify script was updated again
-        $updatedContent2 = file_get_contents($tempDir.'/code-review-guardian.sh');
+        $updatedContent2 = $this->readRequiredFile($tempDir.'/code-review-guardian.sh');
         $this->assertEquals($evenNewerScriptContent, $updatedContent2);
 
         // Cleanup
@@ -1235,7 +1230,7 @@ final class PluginTest extends TestCase
         $updated = $method->invoke($plugin, $io, $source, $dest, 'code-review-guardian.sh', true);
 
         $this->assertTrue($updated);
-        $this->assertSame(file_get_contents($source), file_get_contents($dest));
+        $this->assertSame($this->readRequiredFile($source), $this->readRequiredFile($dest));
         $this->removeDirectory($tempDir);
     }
 
@@ -1301,7 +1296,7 @@ final class PluginTest extends TestCase
         $plugin->activate($composer, $io);
         $plugin->onPostInstall($event);
 
-        $this->assertSame("#!/bin/sh\necho \"local\"\n", file_get_contents($tempDir.'/code-review-guardian.sh'));
+        $this->assertSame("#!/bin/sh\necho \"local\"\n", $this->readRequiredFile($tempDir.'/code-review-guardian.sh'));
         $this->removeDirectory($tempDir);
     }
 
@@ -1322,8 +1317,7 @@ final class PluginTest extends TestCase
         $plugin->activate($composer, $io);
         $plugin->uninstall($composer, $io);
 
-        $remaining = file_get_contents($tempDir.'/.gitignore');
-        $this->assertIsString($remaining);
+        $remaining = $this->readRequiredFile($tempDir.'/.gitignore');
         $this->assertStringNotContainsString('code-review-guardian.sh', $remaining);
         $this->assertStringContainsString('vendor/', $remaining);
 
@@ -1421,8 +1415,7 @@ final class PluginTest extends TestCase
         $plugin->activate($composer, $io);
         $plugin->uninstall($composer, $io);
 
-        $remaining = file_get_contents($tempDir.'/.gitignore');
-        $this->assertIsString($remaining);
+        $remaining = $this->readRequiredFile($tempDir.'/.gitignore');
         $this->assertStringNotContainsString('code-review-guardian.sh', $remaining);
         $this->assertSame(rtrim($remaining), trim($remaining));
 
@@ -1489,8 +1482,8 @@ final class PluginTest extends TestCase
         $method->setAccessible(true);
         $method->invoke($plugin, $packageDir, $tempDir, $io, false);
 
-        $this->assertSame('# Keep AGENTS', file_get_contents($tempDir.'/docs/AGENTS.md'));
-        $this->assertSame('# Keep GGA', file_get_contents($tempDir.'/docs/GGA.md'));
+        $this->assertSame('# Keep AGENTS', $this->readRequiredFile($tempDir.'/docs/AGENTS.md'));
+        $this->assertSame('# Keep GGA', $this->readRequiredFile($tempDir.'/docs/GGA.md'));
         $this->removeDirectory($tempDir);
     }
 
@@ -1567,6 +1560,17 @@ final class PluginTest extends TestCase
 
         $this->assertSame([], $method->invoke($plugin));
         $this->removeDirectory($tempDir);
+    }
+
+    /**
+     * Read a file that must exist and return its contents as string.
+     */
+    private function readRequiredFile(string $path): string
+    {
+        $content = file_get_contents($path);
+        $this->assertNotFalse($content, sprintf('Failed to read file: %s', $path));
+
+        return $content;
     }
 
     /**
