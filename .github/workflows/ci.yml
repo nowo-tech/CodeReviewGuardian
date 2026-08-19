@@ -75,6 +75,9 @@ jobs:
           composer config --unset platform.php
           composer require --dev symfony/framework-bundle:^${{ matrix.symfony }} --no-interaction --no-update
           composer update --with-all-dependencies --no-interaction --prefer-dist --no-progress
+      - name: Composer audit (Critical/High)
+        run: composer audit --locked
+
 
       - name: Run tests
         run: composer test
