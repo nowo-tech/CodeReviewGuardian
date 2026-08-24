@@ -1,10 +1,14 @@
 # Code Review Guardian
 
-[![CI](https://github.com/nowo-tech/CodeReviewGuardian/actions/workflows/ci.yml/badge.svg)](https://github.com/nowo-tech/CodeReviewGuardian/actions/workflows/ci.yml) [![Packagist Version](https://img.shields.io/packagist/v/nowo-tech/code-review-guardian.svg?style=flat)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![Packagist Downloads](https://img.shields.io/packagist/dt/nowo-tech/code-review-guardian.svg)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![PHP](https://img.shields.io/badge/PHP-8.1%2B-777BB4?logo=php)](https://php.net) [![Symfony](https://img.shields.io/badge/Symfony-6.0%2B%20%7C%207.4%2B%20%7C%208.0%20%7C%208.1%2B-000000?logo=symfony)](https://symfony.com)
+[![CI](https://github.com/nowo-tech/CodeReviewGuardian/actions/workflows/ci.yml/badge.svg)](https://github.com/nowo-tech/CodeReviewGuardian/actions/workflows/ci.yml) [![Packagist Version](https://img.shields.io/packagist/v/nowo-tech/code-review-guardian.svg?style=flat)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![Packagist Downloads](https://img.shields.io/packagist/dt/nowo-tech/code-review-guardian.svg)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php)](https://php.net) [![Symfony](https://img.shields.io/badge/Symfony-6.0%2B%20%7C%207.4%2B%20%7C%208.0%20%7C%208.1%2B-000000?logo=symfony)](https://symfony.com)
 
 > ⭐ **Found this useful?** Install from [Packagist](https://packagist.org/packages/nowo-tech/code-review-guardian) and give the repository a star on [GitHub](https://github.com/nowo-tech/CodeReviewGuardian) if it helps your workflow.
 
 > **Abandoned** — This package is no longer maintained. Prefer your Git host’s native review tooling and project-local CI checks. Packagist marks `nowo-tech/code-review-guardian` as abandoned (`composer.json` → `"abandoned": true`).
+
+![FrankenPHP Friendly Worker Mode](docs/images/frankenphp-friendly.png)
+
+This bundle is **FrankenPHP worker mode friendly**.
 
 ## Features
 
