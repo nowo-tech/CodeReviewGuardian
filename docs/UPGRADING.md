@@ -1,3 +1,25 @@
+# Upgrading
+
+## Table of contents
+
+- [From 1.1.4 to 1.1.5](#from-114-to-115)
+
+## From 1.1.4 to 1.1.5
+
+Review the [CHANGELOG](CHANGELOG.md) entry. PHP **8.2+** may now be required.
+
+```bash
+composer update nowo-tech/code-review-guardian
+```
+
+## From 1.1.4 to 1.1.5
+
+Review the [CHANGELOG](CHANGELOG.md) entry. PHP **8.2+** may now be required.
+
+```bash
+composer update nowo-tech/code-review-guardian
+```
+
 # Upgrading Guide
 
 This guide will help you upgrade Code Review Guardian to newer versions.

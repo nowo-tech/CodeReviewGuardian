@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [1.1.5] - 2026-08-24
+
+### Changed
+
+- Raise minimum PHP to **8.2** and sync README badge (REQ-SF-001).
+- **README:** FrankenPHP-friendly worker-mode banner (REQ-DOCS-017).
+- **Docs:** PHP-FIG PSR evaluation (REQ-CS-007).
+
+### Notes
+
+- **No API or configuration changes** for integrators unless noted above.
+
+[1.1.5]: https://github.com/nowo-tech/CodeReviewGuardian/releases/tag/v1.1.5
+
 ## [1.1.4] - 2026-08-19
 
 ### Security
