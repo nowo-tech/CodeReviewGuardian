@@ -43,6 +43,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public function activate(Composer $composer, IOInterface $io): void
     {
+        // @igor-ignore - Composer plugin lifecycle hooks; not FrankenPHP HTTP worker requests.
         $this->composer = $composer;
     }
 

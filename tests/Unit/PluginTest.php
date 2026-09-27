@@ -1568,7 +1568,7 @@ final class PluginTest extends TestCase
     private function readRequiredFile(string $path): string
     {
         $content = file_get_contents($path);
-        $this->assertNotFalse($content, sprintf('Failed to read file: %s', $path));
+        $this->assertNotFalse($content, \sprintf('Failed to read file: %s', $path));
 
         return $content;
     }

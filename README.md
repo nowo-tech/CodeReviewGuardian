@@ -293,7 +293,7 @@ composer qa
 | `make cs-check` | Check code style (PHP-CS-Fixer) |
 | `make cs-fix` | Fix code style |
 | `make rector` / `make rector-dry` | Run Rector (apply or dry-run) |
-| `make phpstan` | Run PHPStan |
+| `make phpstan`, `make igor` | Run PHPStan |
 | `make qa` | Run `cs-check` and tests |
 | `make release-check` | Full pre-release pipeline (see Makefile) |
 | `make composer-sync` | Validate `composer.json` and install dependencies in the container |
