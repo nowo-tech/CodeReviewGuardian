@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.7] - 2026-09-28
+
+### Security
+
+- `bin/comments.sh` reads the Git token via bash indirect expansion (`${!TOKEN_ENV_NAME}`) — no `eval`.
+- Script shebang is bash; wrapper `.backup` file removed from the package.
+
 ## [1.1.6] - 2026-09-27
 
 ### Added
@@ -17,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Worker safety (Igor):** justified `// @igor-ignore` annotations and/or `ResetInterface` / request-scoped fixes so `make igor` passes on package `src/`.
 
+[1.1.7]: https://github.com/nowo-tech/CodeReviewGuardian/releases/tag/v1.1.7
 [1.1.6]: https://github.com/nowo-tech/CodeReviewGuardian/releases/tag/v1.1.6
 
 ## [1.1.5] - 2026-08-24

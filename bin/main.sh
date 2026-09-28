@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # main.sh
 # Main script orchestrator for Code Review Guardian
 # This is the actual implementation that runs from vendor directory

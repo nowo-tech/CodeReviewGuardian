@@ -3,6 +3,16 @@
 
 ## Unreleased
 
+## To 1.1.7
+
+From **1.1.6** — comments.sh hardening (no `eval`).
+
+```bash
+composer update nowo-tech/code-review-guardian
+```
+
+- No application upgrade steps. Token env var names must remain valid bash identifiers (`^[A-Za-z_][A-Za-z0-9_]*$`).
+
 ## To 1.1.6
 
 From **1.1.5** — REQ-CS-008 Igor FrankenPHP worker audit (igor-php require-dev, igor.json, make igor).

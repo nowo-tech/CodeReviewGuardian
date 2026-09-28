@@ -40,6 +40,22 @@ Code Review Guardian is a **development-time** Composer package. It installs scr
 
 Report security issues **privately** (do not open a public issue with exploit details). Contact the maintainers via the email in `composer.json` or the repository security policy.
 
+## AI security audit (REQ-SEC-004)
+
+| Field | Value |
+|-------|--------|
+| **Date** | 2026-09-28 (re-audit wave 5) |
+| **Method** | Monorepo static review + harden (`bin/comments.sh` uses `${!TOKEN_ENV_NAME}` — no `eval`) |
+| **Grade** | **Pass (conditional)** |
+| **Overall residual risk** | Medium |
+
+### Residuals (accepted)
+
+- Package is **abandoned / do-not-use** for new projects; residual Medium includes opt-in wrapper overwrite and trusted-config shell execution.
+- Git token env var names must match `^[A-Za-z_][A-Za-z0-9_]*$`; values are read via bash indirect expansion (not `eval`). Stale `bin/*.backup` with `eval` removed in wave 5 re-audit.
+
+No Critical/High findings remain open for shipping.
+
 ## Release security checklist (12.4.1)
 
 Before tagging a release, confirm:

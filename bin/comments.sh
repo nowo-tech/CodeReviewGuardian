@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # comments.sh
 # Comment posting and environment variable loading functions for Code Review Guardian
 
@@ -73,8 +73,11 @@ get_git_token() {
     # Load .env files in correct order (.env, then .env.local)
     load_env_files
 
-    # Get token from environment (after loading .env files)
-    eval "TOKEN=\$$TOKEN_ENV_NAME" 2>/dev/null || TOKEN=""
+    # Get token from environment (after loading .env files) — no eval
+    TOKEN=""
+    if [[ "$TOKEN_ENV_NAME" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+        TOKEN="${!TOKEN_ENV_NAME-}"
+    fi
 
     # If token is still not found, check if .env files exist
     if [ -z "$TOKEN" ]; then
