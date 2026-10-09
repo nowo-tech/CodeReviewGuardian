@@ -3,6 +3,16 @@
 
 ## Unreleased
 
+## To 1.1.8
+
+From **1.1.7** — require-dev Igor constraint bump.
+
+```bash
+composer update nowo-tech/code-review-guardian
+```
+
+- No breaking changes. No application upgrade steps.
+
 ## To 1.1.7
 
 From **1.1.6** — comments.sh hardening (no `eval`).

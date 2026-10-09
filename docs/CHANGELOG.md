@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.8] - 2026-10-09
+
+### Dependencies
+
+- `igor-php/igor-php` require-dev constraint bumped from `^0.9.7` to `^0.10.0` (Dependabot). Dev tooling only; no runtime impact.
+
 ## [1.1.7] - 2026-09-28
 
 ### Security
@@ -24,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Worker safety (Igor):** justified `// @igor-ignore` annotations and/or `ResetInterface` / request-scoped fixes so `make igor` passes on package `src/`.
 
+[1.1.8]: https://github.com/nowo-tech/CodeReviewGuardian/releases/tag/v1.1.8
 [1.1.7]: https://github.com/nowo-tech/CodeReviewGuardian/releases/tag/v1.1.7
 [1.1.6]: https://github.com/nowo-tech/CodeReviewGuardian/releases/tag/v1.1.6
 
