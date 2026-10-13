@@ -1,5 +1,34 @@
 # Upgrading
 
+## Table of contents
+
+- [Unreleased](#unreleased)
+- [To 1.1.9](#to-119)
+- [To 1.1.8](#to-118)
+- [To 1.1.7](#to-117)
+- [To 1.1.6](#to-116)
+- [From 1.1.4 to 1.1.5](#from-114-to-115)
+- [From 1.1.4 to 1.1.5](#from-114-to-115-1)
+- [General Upgrade Process](#general-upgrade-process)
+- [Version-Specific Upgrade Notes](#version-specific-upgrade-notes)
+  - [Upgrading to 1.1.4](#upgrading-to-114)
+  - [Upgrading to 1.1.3](#upgrading-to-113)
+  - [Upgrading to 1.1.2](#upgrading-to-112)
+  - [Upgrading to 1.1.1](#upgrading-to-111)
+  - [Upgrading to 1.1.0](#upgrading-to-110)
+  - [Upgrading to 1.0.1](#upgrading-to-101)
+  - [Upgrading to 1.0.0](#upgrading-to-100)
+  - [Upgrading to 0.0.7](#upgrading-to-007)
+  - [Upgrading to 0.0.5](#upgrading-to-005)
+  - [Upgrading to 0.0.3](#upgrading-to-003)
+  - [Upgrading to 0.0.1+](#upgrading-to-001)
+- [Troubleshooting](#troubleshooting)
+  - [Script not found after upgrade](#script-not-found-after-upgrade)
+  - [Permission errors](#permission-errors)
+  - [Configuration file not found](#configuration-file-not-found)
+  - [Conflicts with custom modifications](#conflicts-with-custom-modifications)
+- [Getting Help](#getting-help)
+
 ## Unreleased
 
 ## To 1.1.9
@@ -43,10 +72,6 @@ php bin/console cache:clear
 ```
 
 - No application upgrade steps for require-dev Igor tooling (REQ-CS-008). Consumers do not pull `igor-php/igor-php` transitively.
-
-## Table of contents
-
-- [From 1.1.4 to 1.1.5](#from-114-to-115)
 
 ## From 1.1.4 to 1.1.5
 
