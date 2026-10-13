@@ -55,38 +55,98 @@ final class PluginTest extends TestCase
     {
         $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
         $vendorDir = $tempDir.'/vendor';
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
         $docsDir = $tempDir.'/docs';
-        mkdir($vendorDir, 0777, true);
+        mkdir($packageDir.'/config/laravel', 0777, true);
+        mkdir($packageDir.'/docs', 0777, true);
         mkdir($docsDir, 0777, true);
 
-        // Create test files
+        // Shipped documentation (AGENTS.md may come from any framework directory)
+        file_put_contents($packageDir.'/config/laravel/AGENTS.md', '# Agents');
+        file_put_contents($packageDir.'/docs/GGA.md', '# GGA');
+
+        // Create test files (unmodified copies of the shipped docs)
         file_put_contents($tempDir.'/code-review-guardian.sh', '#!/bin/sh');
         file_put_contents($tempDir.'/code-review-guardian.yaml', 'config: true');
         file_put_contents($docsDir.'/AGENTS.md', '# Agents');
-
-        $config = $this->createMock(Config::class);
-        $config->method('get')
-            ->with('vendor-dir')
-            ->willReturn($vendorDir);
-
-        $composer = $this->createMock(Composer::class);
-        $composer->method('getConfig')
-            ->willReturn($config);
+        file_put_contents($docsDir.'/GGA.md', '# GGA');
 
         $io = $this->createMock(IOInterface::class);
+        $io->expects($this->atLeastOnce())
+            ->method('write')
+            ->with($this->callback(static fn ($message): bool => !str_contains((string) $message, 'Keeping')));
 
         $plugin = new Plugin();
+        $composer = $this->createComposerWithVendorDir($vendorDir);
         $plugin->activate($composer, $io);
         $plugin->uninstall($composer, $io);
 
         $this->assertFileDoesNotExist($tempDir.'/code-review-guardian.sh');
         $this->assertFileDoesNotExist($tempDir.'/code-review-guardian.yaml');
         $this->assertFileDoesNotExist($docsDir.'/AGENTS.md');
+        $this->assertFileDoesNotExist($docsDir.'/GGA.md');
 
-        // Cleanup
-        @rmdir($docsDir);
-        @rmdir($vendorDir);
-        @rmdir($tempDir);
+        $this->removeDirectory($tempDir);
+    }
+
+    public function testUninstallKeepsUserWrittenDocumentationFiles(): void
+    {
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
+        $docsDir = $tempDir.'/docs';
+        mkdir($packageDir.'/config/symfony', 0777, true);
+        mkdir($packageDir.'/docs', 0777, true);
+        mkdir($docsDir, 0777, true);
+
+        file_put_contents($packageDir.'/config/symfony/AGENTS.md', '# Agents');
+        file_put_contents($packageDir.'/docs/GGA.md', '# GGA');
+
+        // The user wrote / edited these files: they must survive uninstall
+        file_put_contents($docsDir.'/AGENTS.md', '# My own agents guide');
+        file_put_contents($docsDir.'/GGA.md', '# GGA (edited)');
+
+        $messages = [];
+        $io = $this->createMock(IOInterface::class);
+        $io->method('write')->willReturnCallback(static function ($message) use (&$messages): void {
+            $messages[] = (string) $message;
+        });
+
+        $plugin = new Plugin();
+        $composer = $this->createComposerWithVendorDir($vendorDir);
+        $plugin->activate($composer, $io);
+        $plugin->uninstall($composer, $io);
+
+        $this->assertSame('# My own agents guide', $this->readRequiredFile($docsDir.'/AGENTS.md'));
+        $this->assertSame('# GGA (edited)', $this->readRequiredFile($docsDir.'/GGA.md'));
+        $this->assertStringContainsString('Keeping <info>docs/AGENTS.md</info>', implode("\n", $messages));
+        $this->assertStringContainsString('Keeping <info>docs/GGA.md</info>', implode("\n", $messages));
+        $this->assertStringContainsString('No files to remove', implode("\n", $messages));
+
+        $this->removeDirectory($tempDir);
+    }
+
+    public function testUninstallKeepsDocumentationWhenPackageSourcesAreMissing(): void
+    {
+        $tempDir = sys_get_temp_dir().'/code-review-guardian-plugin-test-'.uniqid();
+        $vendorDir = $tempDir.'/vendor';
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
+        $docsDir = $tempDir.'/docs';
+        mkdir($packageDir, 0777, true);
+        mkdir($docsDir, 0777, true);
+
+        file_put_contents($docsDir.'/GGA.md', '# GGA');
+
+        $io = $this->createMock(IOInterface::class);
+
+        $plugin = new Plugin();
+        $composer = $this->createComposerWithVendorDir($vendorDir);
+        $plugin->activate($composer, $io);
+        $plugin->uninstall($composer, $io);
+
+        $this->assertFileExists($docsDir.'/GGA.md');
+
+        $this->removeDirectory($tempDir);
     }
 
     public function testOnPostInstallInstallsFiles(): void
@@ -1560,6 +1620,20 @@ final class PluginTest extends TestCase
 
         $this->assertSame([], $method->invoke($plugin));
         $this->removeDirectory($tempDir);
+    }
+
+    private function createComposerWithVendorDir(string $vendorDir): Composer
+    {
+        $config = $this->createMock(Config::class);
+        $config->method('get')
+            ->with('vendor-dir')
+            ->willReturn($vendorDir);
+
+        $composer = $this->createMock(Composer::class);
+        $composer->method('getConfig')
+            ->willReturn($config);
+
+        return $composer;
     }
 
     /**

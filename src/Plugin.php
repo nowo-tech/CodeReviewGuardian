@@ -117,12 +117,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     {
         $vendorDir = $this->composer->getConfig()->get('vendor-dir');
         $projectDir = \dirname((string) $vendorDir);
-        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
-
-        // If package is not in vendor (development mode), use current directory
-        if (!is_dir($packageDir)) {
-            $packageDir = __DIR__.'/..';
-        }
+        $packageDir = $this->resolvePackageDir((string) $vendorDir);
 
         // Detect framework
         $composerJsonPath = $projectDir.'/composer.json';
@@ -362,22 +357,12 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             }
         }
 
-        // Remove documentation files
-        $docsDir = $projectDir.'/docs';
-        $docFiles = [
-            'AGENTS.md',
-        ];
-
-        foreach ($docFiles as $file) {
-            $path = $docsDir.'/'.$file;
-
-            if (file_exists($path)) {
-                $io->write(\sprintf('  <comment>-</comment> Removing <info>docs/%s</info>', $file), false);
-                unlink($path);
-                $io->write(' <info>✓</info>');
-                ++$removedCount;
-            }
-        }
+        // Remove documentation files only when they are unmodified copies of what the package ships
+        $removedCount += $this->removeShippedDocumentationFiles(
+            $projectDir.'/docs',
+            $this->resolvePackageDir((string) $vendorDir),
+            $io,
+        );
 
         // Remove .gitignore entries
         $io->write('<info>Cleaning up .gitignore...</info>');
@@ -388,6 +373,74 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         } else {
             $io->write('<info>No files to remove (already cleaned up)</info>');
         }
+    }
+
+    /**
+     * Resolve the package directory (vendor copy, or this checkout in development mode).
+     *
+     * @param string $vendorDir The Composer vendor directory
+     *
+     * @return string The package directory
+     */
+    private function resolvePackageDir(string $vendorDir): string
+    {
+        $packageDir = $vendorDir.'/nowo-tech/code-review-guardian';
+
+        // If package is not in vendor (development mode), use current directory
+        if (!is_dir($packageDir)) {
+            $packageDir = __DIR__.'/..';
+        }
+
+        return $packageDir;
+    }
+
+    /**
+     * Remove docs/AGENTS.md and docs/GGA.md only when their content matches a version shipped by the package.
+     *
+     * Install never overwrites existing documentation, so a file that differs was written or edited by the
+     * user and must be kept.
+     *
+     * @param string      $docsDir    The project docs directory
+     * @param string      $packageDir The package directory
+     * @param IOInterface $io         The IO interface
+     *
+     * @return int Number of removed files
+     */
+    private function removeShippedDocumentationFiles(string $docsDir, string $packageDir, IOInterface $io): int
+    {
+        $agentsSources = glob($packageDir.'/config/*/AGENTS.md');
+        $docFiles = [
+            'AGENTS.md' => false === $agentsSources ? [] : $agentsSources,
+            'GGA.md' => [$packageDir.'/docs/GGA.md'],
+        ];
+
+        $removedCount = 0;
+        foreach ($docFiles as $file => $sourcePaths) {
+            $path = $docsDir.'/'.$file;
+
+            if (!is_file($path)) {
+                continue;
+            }
+
+            $shippedHashes = [];
+            foreach ($sourcePaths as $sourcePath) {
+                if (is_file($sourcePath)) {
+                    $shippedHashes[] = hash_file('sha256', $sourcePath);
+                }
+            }
+
+            if (!\in_array(hash_file('sha256', $path), $shippedHashes, true)) {
+                $io->write(\sprintf('  <comment>-</comment> Keeping <info>docs/%s</info> (differs from the package version)', $file));
+                continue;
+            }
+
+            $io->write(\sprintf('  <comment>-</comment> Removing <info>docs/%s</info>', $file), false);
+            unlink($path);
+            $io->write(' <info>✓</info>');
+            ++$removedCount;
+        }
+
+        return $removedCount;
     }
 
     /**

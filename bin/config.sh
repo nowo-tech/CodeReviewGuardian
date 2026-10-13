@@ -19,12 +19,30 @@ parse_yaml_value() {
     local key="$1"
     local section="${2:-}"
     local default="${3:-}"
+    local value
 
+    # Note: "pipeline || echo default" never applies the default (the pipeline status is the last
+    # command's, which succeeds on empty input), so fall back explicitly on an empty value.
     if [ -n "$section" ]; then
-        grep -A 20 "^${section}:" "$CONFIG_FILE" 2>/dev/null | grep "^\s*${key}:" | head -1 | awk -F: '{print $2}' | sed 's/#.*$//' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//" || echo "$default"
+        value=$(grep -A 20 "^${section}:" "$CONFIG_FILE" 2>/dev/null | grep "^\s*${key}:" | head -1 | awk -F: '{print $2}' | sed 's/#.*$//' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//")
     else
-        grep "^${key}:" "$CONFIG_FILE" 2>/dev/null | head -1 | awk -F: '{print $2}' | sed 's/#.*$//' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//" || echo "$default"
+        value=$(grep "^${key}:" "$CONFIG_FILE" 2>/dev/null | head -1 | awk -F: '{print $2}' | sed 's/#.*$//' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//")
     fi
+
+    [ -n "$value" ] || value="$default"
+    printf '%s\n' "$value"
+}
+
+# Parse a value nested under agents.behavior (falls back to the default when missing or empty)
+parse_agents_behavior_value() {
+    local key="$1"
+    local default="${2:-}"
+    local value
+
+    value=$(grep -A 10 "^agents:" "$CONFIG_FILE" 2>/dev/null | grep -A 5 "behavior:" | grep "${key}:" | head -1 | awk -F: '{print $2}' | sed 's/#.*$//' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^"//;s/"$//')
+
+    [ -n "$value" ] || value="$default"
+    printf '%s\n' "$value"
 }
 
 # Parse YAML array (simple parser for list format)
@@ -74,10 +92,10 @@ load_config() {
     CONFIG_AGENTS_REVIEW_SCOPE=$(parse_yaml_array "review_scope" "agents")
 
     # Load Agents behavior settings (nested under agents.behavior)
-    CONFIG_AGENTS_SUGGEST_FIXES=$(grep -A 10 "^agents:" "$CONFIG_FILE" 2>/dev/null | grep -A 5 "behavior:" | grep "suggest_fixes:" | head -1 | awk -F: '{print $2}' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^"//;s/"$//' || echo "true")
-    CONFIG_AGENTS_EXPLAIN_ISSUES=$(grep -A 10 "^agents:" "$CONFIG_FILE" 2>/dev/null | grep -A 5 "behavior:" | grep "explain_issues:" | head -1 | awk -F: '{print $2}' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^"//;s/"$//' || echo "true")
-    CONFIG_AGENTS_PROVIDE_EXAMPLES=$(grep -A 10 "^agents:" "$CONFIG_FILE" 2>/dev/null | grep -A 5 "behavior:" | grep "provide_examples:" | head -1 | awk -F: '{print $2}' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^"//;s/"$//' || echo "true")
-    CONFIG_AGENTS_SEVERITY_THRESHOLD=$(grep -A 10 "^agents:" "$CONFIG_FILE" 2>/dev/null | grep -A 5 "behavior:" | grep "severity_threshold:" | head -1 | awk -F: '{print $2}' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^"//;s/"$//' || echo "medium")
+    CONFIG_AGENTS_SUGGEST_FIXES=$(parse_agents_behavior_value "suggest_fixes" "true")
+    CONFIG_AGENTS_EXPLAIN_ISSUES=$(parse_agents_behavior_value "explain_issues" "true")
+    CONFIG_AGENTS_PROVIDE_EXAMPLES=$(parse_agents_behavior_value "provide_examples" "true")
+    CONFIG_AGENTS_SEVERITY_THRESHOLD=$(parse_agents_behavior_value "severity_threshold" "medium")
 
     # Load Rules settings
     CONFIG_RULES_BLOCK_CRITICAL=$(parse_yaml_value "block_on_critical_issues" "rules" "true")

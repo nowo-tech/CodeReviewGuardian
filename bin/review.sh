@@ -240,6 +240,11 @@ run_review() {
     echo "$E_INFO Filtering files based on patterns..."
     FILTERED_COUNT=0
 
+    FILTERED_TMP=$(mktemp "${TMPDIR:-/tmp}/crg_filtered_files.XXXXXX") || {
+        echo "$E_ERROR Could not create a temporary file."
+        return 1
+    }
+
     echo "$CHANGED_FILES" | while IFS= read -r file; do
         [ -z "$file" ] && continue
 
@@ -247,11 +252,11 @@ run_review() {
             echo "$file"
             FILTERED_COUNT=$((FILTERED_COUNT + 1))
         fi
-    done > /tmp/crg_filtered_files.$$
+    done > "$FILTERED_TMP"
 
-    FILTERED_FILES=$(cat /tmp/crg_filtered_files.$$ 2>/dev/null || echo "")
+    FILTERED_FILES=$(cat "$FILTERED_TMP" 2>/dev/null || echo "")
     FILTERED_COUNT=$(echo "$FILTERED_FILES" | grep -v "^$" | wc -l | tr -d ' ')
-    rm -f /tmp/crg_filtered_files.$$
+    rm -f "$FILTERED_TMP"
 
     if [ "$FILTERED_COUNT" -eq 0 ]; then
         echo "$E_WARNING No files match the configured patterns."

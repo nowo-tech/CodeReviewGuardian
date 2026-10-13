@@ -81,21 +81,23 @@ get_git_token() {
 
     # If token is still not found, check if .env files exist
     if [ -z "$TOKEN" ]; then
-        echo "$E_WARNING Git token not found: $TOKEN_ENV_NAME"
-        echo ""
+        # Diagnostics go to stderr: this function is called inside $(...) and stdout must only carry the token
+        {
+            echo "$E_WARNING Git token not found: $TOKEN_ENV_NAME"
+            echo ""
 
-        # Check if .env files exist
-        if [ ! -f ".env" ] && [ ! -f ".env.local" ]; then
-            echo "$E_INFO No .env file found. Creating .env file from .env.example if it exists..."
+            # Check if .env files exist
+            if [ ! -f ".env" ] && [ ! -f ".env.local" ]; then
+                echo "$E_INFO No .env file found. Creating .env file from .env.example if it exists..."
 
-            # Try to create .env from .env.example if it exists
-            if [ -f ".env.example" ]; then
-                cp ".env.example" ".env"
-                echo "$E_OK Created .env file from .env.example"
-                echo "$E_INFO Please edit .env and set $TOKEN_ENV_NAME with your Git provider token."
-            else
-                # Create a basic .env file with a comment
-                cat > ".env" <<EOF
+                # Try to create .env from .env.example if it exists
+                if [ -f ".env.example" ]; then
+                    cp ".env.example" ".env"
+                    echo "$E_OK Created .env file from .env.example"
+                    echo "$E_INFO Please edit .env and set $TOKEN_ENV_NAME with your Git provider token."
+                else
+                    # Create a basic .env file with a comment
+                    cat > ".env" <<EOF
 # Code Review Guardian Configuration
 # Add your Git provider token below
 # See docs/TOKEN_SETUP.md for detailed instructions
@@ -103,50 +105,51 @@ get_git_token() {
 # Git Provider API Token (required for posting comments to PRs/MRs)
 $TOKEN_ENV_NAME=your_token_here
 EOF
-                echo "$E_OK Created .env file with template"
-                echo "$E_INFO Please edit .env and set $TOKEN_ENV_NAME with your Git provider token."
-            fi
-        else
-            # .env file exists but token is not set
-            if [ -f ".env" ]; then
-                if ! grep -q "^${TOKEN_ENV_NAME}=" .env && ! grep -q "^${TOKEN_ENV_NAME}=" .env.local 2>/dev/null; then
-                    echo "$E_INFO Adding $TOKEN_ENV_NAME to .env file..."
+                    echo "$E_OK Created .env file with template"
+                    echo "$E_INFO Please edit .env and set $TOKEN_ENV_NAME with your Git provider token."
+                fi
+            else
+                # .env file exists but token is not set
+                if [ -f ".env" ]; then
+                    if ! grep -q "^${TOKEN_ENV_NAME}=" .env && ! grep -q "^${TOKEN_ENV_NAME}=" .env.local 2>/dev/null; then
+                        echo "$E_INFO Adding $TOKEN_ENV_NAME to .env file..."
 
-                    # Append token to .env file (use .env.local if it exists, otherwise .env)
-                    env_target=".env"
-                    if [ -f ".env.local" ]; then
-                        env_target=".env.local"
-                    fi
+                        # Append token to .env file (use .env.local if it exists, otherwise .env)
+                        env_target=".env"
+                        if [ -f ".env.local" ]; then
+                            env_target=".env.local"
+                        fi
 
-                    {
-                        echo ""
-                        echo "# Git Provider API Token (required for posting comments to PRs/MRs)"
-                        echo "$TOKEN_ENV_NAME=your_token_here"
-                    } >> "$env_target"
-
-                    echo "$E_OK Added $TOKEN_ENV_NAME to $env_target"
-
-                    # Also add to .env.dist if it exists
-                    if [ -f ".env.dist" ] && ! grep -q "^${TOKEN_ENV_NAME}=" .env.dist 2>/dev/null; then
                         {
                             echo ""
                             echo "# Git Provider API Token (required for posting comments to PRs/MRs)"
                             echo "$TOKEN_ENV_NAME=your_token_here"
-                        } >> ".env.dist"
-                        echo "$E_OK Also added $TOKEN_ENV_NAME to .env.dist"
-                    fi
+                        } >> "$env_target"
 
-                    echo "$E_INFO Please edit $env_target and set $TOKEN_ENV_NAME with your Git provider token."
-                else
-                    echo "$E_INFO Variable $TOKEN_ENV_NAME exists in .env file but is empty or commented out."
-                    echo "$E_INFO Please uncomment or set the value in .env or .env.local"
+                        echo "$E_OK Added $TOKEN_ENV_NAME to $env_target"
+
+                        # Also add to .env.dist if it exists
+                        if [ -f ".env.dist" ] && ! grep -q "^${TOKEN_ENV_NAME}=" .env.dist 2>/dev/null; then
+                            {
+                                echo ""
+                                echo "# Git Provider API Token (required for posting comments to PRs/MRs)"
+                                echo "$TOKEN_ENV_NAME=your_token_here"
+                            } >> ".env.dist"
+                            echo "$E_OK Also added $TOKEN_ENV_NAME to .env.dist"
+                        fi
+
+                        echo "$E_INFO Please edit $env_target and set $TOKEN_ENV_NAME with your Git provider token."
+                    else
+                        echo "$E_INFO Variable $TOKEN_ENV_NAME exists in .env file but is empty or commented out."
+                        echo "$E_INFO Please uncomment or set the value in .env or .env.local"
+                    fi
                 fi
             fi
-        fi
 
-        echo ""
-        echo "$E_INFO See docs/TOKEN_SETUP.md for detailed step-by-step instructions."
-        echo "$E_INFO Order of .env file loading: .env (base) → .env.local (overrides)"
+            echo ""
+            echo "$E_INFO See docs/TOKEN_SETUP.md for detailed step-by-step instructions."
+            echo "$E_INFO Order of .env file loading: .env (base) → .env.local (overrides)"
+        } >&2
 
         return 1
     fi

@@ -52,7 +52,7 @@ After installation, the following files will be copied to your project:
 
 ### Removing the package
 
-When you run `composer remove nowo-tech/code-review-guardian`, the plugin removes `code-review-guardian.sh`, `code-review-guardian.yaml`, and `docs/AGENTS.md`, and cleans the Code Review Guardian block from `.gitignore`. **`docs/GGA.md` is not removed** — delete it manually if you no longer need it.
+When you run `composer remove nowo-tech/code-review-guardian`, the plugin removes `code-review-guardian.sh` and `code-review-guardian.yaml`, and cleans the Code Review Guardian block from `.gitignore`. `docs/AGENTS.md` and `docs/GGA.md` are removed **only when their content is identical to a version shipped by the package**; if you wrote or edited them, they are kept.
 
 ### Environment Configuration
 

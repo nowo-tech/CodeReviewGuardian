@@ -3,6 +3,9 @@
 
 ## Unreleased
 
+- **Uninstall:** `composer remove nowo-tech/code-review-guardian` now removes `docs/AGENTS.md` and `docs/GGA.md` only when they are unmodified copies of the shipped files; edited or user-written copies are kept (previously `docs/AGENTS.md` was always deleted and `docs/GGA.md` never).
+- **Config defaults:** missing keys in `code-review-guardian.yaml` now fall back to the documented defaults (e.g. `gga.max_comments: 50`, `comments.format: markdown`) instead of empty values. No action needed unless you relied on empty values.
+
 ## To 1.1.8
 
 From **1.1.7** — require-dev Igor constraint bump.

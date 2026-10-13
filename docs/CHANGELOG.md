@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Uninstall no longer deletes a user-written or edited `docs/AGENTS.md`: `docs/AGENTS.md` and `docs/GGA.md` are removed only when their content matches a version shipped by the package (SHA-256 compare); `docs/GGA.md`, which install creates, is now cleaned up too.
+- `bin/config.sh`: configuration defaults are applied again when a key is missing or empty (`pipeline || echo default` never fired because the pipeline status is the last `sed`'s). Values under `agents.behavior` now also strip inline `# comments`.
+- `bin/comments.sh`: `get_git_token` writes its warnings/instructions to stderr, so `TOKEN=$(get_git_token)` only captures the token.
+
+### Security
+
+- `bin/review.sh`: the filtered-files list uses a private `mktemp` file (honours `$TMPDIR`) instead of the predictable `/tmp/crg_filtered_files.$$`.
+
 ## [1.1.8] - 2026-10-09
 
 ### Dependencies
