@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.9] - 2026-10-13
+
 ### Fixed
 
 - Uninstall no longer deletes a user-written or edited `docs/AGENTS.md`: `docs/AGENTS.md` and `docs/GGA.md` are removed only when their content matches a version shipped by the package (SHA-256 compare); `docs/GGA.md`, which install creates, is now cleaned up too.
@@ -40,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Worker safety (Igor):** justified `// @igor-ignore` annotations and/or `ResetInterface` / request-scoped fixes so `make igor` passes on package `src/`.
 
+[1.1.9]: https://github.com/nowo-tech/CodeReviewGuardian/releases/tag/v1.1.9
 [1.1.8]: https://github.com/nowo-tech/CodeReviewGuardian/releases/tag/v1.1.8
 [1.1.7]: https://github.com/nowo-tech/CodeReviewGuardian/releases/tag/v1.1.7
 [1.1.6]: https://github.com/nowo-tech/CodeReviewGuardian/releases/tag/v1.1.6

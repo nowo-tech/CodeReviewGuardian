@@ -1,7 +1,14 @@
 # Upgrading
 
-
 ## Unreleased
+
+## To 1.1.9
+
+From **1.1.8** — uninstall keeps user-edited docs; shell config defaults applied.
+
+```bash
+composer update nowo-tech/code-review-guardian
+```
 
 - **Uninstall:** `composer remove nowo-tech/code-review-guardian` now removes `docs/AGENTS.md` and `docs/GGA.md` only when they are unmodified copies of the shipped files; edited or user-written copies are kept (previously `docs/AGENTS.md` was always deleted and `docs/GGA.md` never).
 - **Config defaults:** missing keys in `code-review-guardian.yaml` now fall back to the documented defaults (e.g. `gga.max_comments: 50`, `comments.format: markdown`) instead of empty values. No action needed unless you relied on empty values.
