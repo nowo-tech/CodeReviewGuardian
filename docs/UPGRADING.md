@@ -3,6 +3,7 @@
 ## Table of contents
 
 - [Unreleased](#unreleased)
+- [To 1.1.10](#to-1110)
 - [To 1.1.9](#to-119)
 - [To 1.1.8](#to-118)
 - [To 1.1.7](#to-117)
@@ -30,6 +31,14 @@
 - [Getting Help](#getting-help)
 
 ## Unreleased
+
+## To 1.1.10
+
+From **1.1.9**:
+
+```bash
+composer update nowo-tech/code-review-guardian
+```
 
 ## To 1.1.9
 
