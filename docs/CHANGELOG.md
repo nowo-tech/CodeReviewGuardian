@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Table of contents
 
 - [[Unreleased]](#unreleased)
+- [[1.2.0] - 2026-10-21](#120---2026-10-21)
 - [[1.1.10] - 2026-10-20](#1110---2026-10-20)
 - [[1.1.9] - 2026-10-13](#119---2026-10-13)
 - [[1.1.8] - 2026-10-09](#118---2026-10-09)
@@ -30,6 +31,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[0.0.1] - 2025-12-26](#001---2025-12-26)
 
 ## [Unreleased]
+
+## [1.2.0] - 2026-10-21
+
+Wave-2 REQ compliance: final classes, full release-check chain with open-PR and Igor gates, PHPStan and Igor on every push. See [UPGRADING](UPGRADING.md#to-120).
 
 ### Changed
 
@@ -81,6 +86,7 @@ Documentation: wave-1 REQ compliance (README, CONTRIBUTING, TOCs). See [UPGRADIN
 
 - **Worker safety (Igor):** justified `// @igor-ignore` annotations and/or `ResetInterface` / request-scoped fixes so `make igor` passes on package `src/`.
 
+[1.2.0]: https://github.com/nowo-tech/CodeReviewGuardian/releases/tag/v1.2.0
 [1.1.10]: https://github.com/nowo-tech/CodeReviewGuardian/releases/tag/v1.1.10
 [1.1.9]: https://github.com/nowo-tech/CodeReviewGuardian/releases/tag/v1.1.9
 [1.1.8]: https://github.com/nowo-tech/CodeReviewGuardian/releases/tag/v1.1.8

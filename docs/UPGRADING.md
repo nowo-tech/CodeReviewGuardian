@@ -3,6 +3,7 @@
 ## Table of contents
 
 - [Unreleased](#unreleased)
+- [To 1.2.0](#to-120)
 - [To 1.1.10](#to-1110)
 - [To 1.1.9](#to-119)
 - [To 1.1.8](#to-118)
@@ -31,6 +32,14 @@
 - [Getting Help](#getting-help)
 
 ## Unreleased
+
+## To 1.2.0
+
+From **1.1.10**:
+
+```bash
+composer update nowo-tech/code-review-guardian
+```
 
 - `NowoTech\CodeReviewGuardian\Plugin` and `FrameworkDetector` are now `final`. They were never documented extension
   points; if you extended either class, wrap it (composition) instead.
