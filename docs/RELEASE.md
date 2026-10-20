@@ -1,5 +1,12 @@
 # Release process
 
+## Table of contents
+
+- [Versioning](#versioning)
+- [GitHub Release](#github-release)
+- [Before tagging](#before-tagging)
+- [Maintenance](#maintenance)
+
 ## Versioning
 
 This package follows semantic versioning. Git tags use the `v*` prefix (for example `v1.0.0`).

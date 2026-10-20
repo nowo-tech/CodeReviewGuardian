@@ -8,6 +8,17 @@
 | Method | Manual review of every file under `src/` (`Plugin.php`, `FrameworkDetector.php`); `bin/*.sh` and `config/*` checked to confirm they are shell scripts / static files copied into the project |
 | **Verdict** | — **Not applicable** — Composer plugin that copies a shell script, YAML and Markdown files on `composer install/update`; no Symfony bundle, no container services, nothing runs inside the HTTP worker |
 
+## Table of contents
+
+- [Execution model assumed](#execution-model-assumed)
+- [Why it does not run in the worker](#why-it-does-not-run-in-the-worker)
+- [Summary](#summary)
+- [Services reviewed](#services-reviewed)
+- [Findings](#findings)
+  - [W-01 — Package is abandoned (Info)](#w-01--package-is-abandoned-info)
+- [Usage recommendations in worker mode](#usage-recommendations-in-worker-mode)
+- [Re-audit triggers](#re-audit-triggers)
+
 ## Execution model assumed
 
 FrankenPHP worker mode boots the Symfony kernel once per worker and serves many requests with the same container. This audit assumes the **strict** variant: the kernel is **not** rebooted between requests, so every shared service, static property and PHP global survives from one request to the next. Two scenarios are evaluated:

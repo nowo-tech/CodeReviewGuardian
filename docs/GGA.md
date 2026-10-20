@@ -2,6 +2,36 @@
 
 Git Guardian Angel (GGA) is an intelligent code review system that works seamlessly with Code Review Guardian to provide automated code reviews across different Git providers.
 
+## Table of contents
+
+- [What is Git Guardian Angel?](#what-is-git-guardian-angel)
+- [Quick Start](#quick-start)
+  - [1. Install Code Review Guardian](#1-install-code-review-guardian)
+  - [2. Configure Git Token](#2-configure-git-token)
+  - [3. Configure Code Review Guardian](#3-configure-code-review-guardian)
+  - [4. Run in CI/CD](#4-run-in-cicd)
+- [Configuration Options](#configuration-options)
+  - [Git Provider Settings](#git-provider-settings)
+  - [Git Guardian Angel Settings](#git-guardian-angel-settings)
+  - [Agent Configuration](#agent-configuration)
+- [Provider-Specific Setup](#provider-specific-setup)
+  - [GitHub](#github)
+  - [GitLab](#gitlab)
+  - [Bitbucket](#bitbucket)
+- [Advanced Configuration](#advanced-configuration)
+  - [Framework-Specific File Patterns](#framework-specific-file-patterns)
+  - [GGA Provider Options](#gga-provider-options)
+- [Integration Examples](#integration-examples)
+  - [GitHub Actions](#github-actions)
+  - [GitLab CI](#gitlab-ci)
+  - [Bitbucket Pipelines](#bitbucket-pipelines)
+- [Troubleshooting](#troubleshooting)
+  - [Token not found](#token-not-found)
+  - [Comments not posting](#comments-not-posting)
+  - [Wrong provider detected](#wrong-provider-detected)
+- [Security Best Practices](#security-best-practices)
+- [Additional Resources](#additional-resources)
+
 ## What is Git Guardian Angel?
 
 Git Guardian Angel is a provider-agnostic system that:

@@ -30,6 +30,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Documentation
+
+- Documentation: wave-1 REQ compliance — README badges (GitHub stars, Coverage) and documentation list order, product blurb moved to the preamble, CONTRIBUTING Cursor Agent queue settings and post-commit co-author check, TOCs for long docs.
+
 ## [1.1.9] - 2026-10-13
 
 ### Fixed

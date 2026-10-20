@@ -1,8 +1,10 @@
 # Code Review Guardian
 
-[![CI](https://github.com/nowo-tech/CodeReviewGuardian/actions/workflows/ci.yml/badge.svg)](https://github.com/nowo-tech/CodeReviewGuardian/actions/workflows/ci.yml) [![Packagist Version](https://img.shields.io/packagist/v/nowo-tech/code-review-guardian.svg?style=flat)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![Packagist Downloads](https://img.shields.io/packagist/dt/nowo-tech/code-review-guardian.svg)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php)](https://php.net) [![Symfony](https://img.shields.io/badge/Symfony-6.0%2B%20%7C%207.4%2B%20%7C%208.0%20%7C%208.1%2B-000000?logo=symfony)](https://symfony.com)
+[![CI](https://github.com/nowo-tech/CodeReviewGuardian/actions/workflows/ci.yml/badge.svg)](https://github.com/nowo-tech/CodeReviewGuardian/actions/workflows/ci.yml) [![Packagist Version](https://img.shields.io/packagist/v/nowo-tech/code-review-guardian.svg?style=flat)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![Packagist Downloads](https://img.shields.io/packagist/dt/nowo-tech/code-review-guardian.svg)](https://packagist.org/packages/nowo-tech/code-review-guardian) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php)](https://php.net) [![Symfony](https://img.shields.io/badge/Symfony-6.0%2B%20%7C%207.4%2B%20%7C%208.0%20%7C%208.1%2B-000000?logo=symfony)](https://symfony.com) [![GitHub stars](https://img.shields.io/github/stars/nowo-tech/code-review-guardian.svg?style=social&label=Star)](https://github.com/nowo-tech/CodeReviewGuardian) [![Coverage](https://img.shields.io/badge/Coverage-100%25-brightgreen)](#tests-and-coverage)
 
 > ⭐ **Found this useful?** Install from [Packagist](https://packagist.org/packages/nowo-tech/code-review-guardian) and give the repository a star on [GitHub](https://github.com/nowo-tech/CodeReviewGuardian) if it helps your workflow.
+
+Provider-agnostic code review guardian for PHP projects. Works with any PHP project: **Symfony**, **Laravel**, **Yii**, **CodeIgniter**, **Slim**, **Laminas**, etc. and any Git provider: **GitHub**, **GitLab**, **Bitbucket**, etc.
 
 > **Abandoned** — This package is no longer maintained. Prefer your Git host’s native review tooling and project-local CI checks. Packagist marks `nowo-tech/code-review-guardian` as abandoned (`composer.json` → `"abandoned": true`).
 
@@ -340,10 +342,8 @@ Together with Code Review Guardian, you get a complete development workflow:
 
 ## Documentation
 
-- [GitHub Actions CI requirements](docs/GITHUB_CI.md)
 - [Installation](docs/INSTALLATION.md)
 - [Configuration](docs/CONFIGURATION.md)
-- [PSR evaluation (REQ-CS-007)](docs/PSR.md)
 - [Usage](docs/USAGE.md)
 - [Contributing](docs/CONTRIBUTING.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
@@ -357,12 +357,12 @@ Together with Code Review Guardian, you get a complete development workflow:
 
 ### Additional documentation
 
+- [GitHub Actions CI requirements](docs/GITHUB_CI.md)
+- [PSR evaluation (REQ-CS-007)](docs/PSR.md)
 - [Token setup](docs/TOKEN_SETUP.md)
 - [Git Guardian Angel (GGA)](docs/GGA.md)
 - [AI agents configuration](docs/AGENTS_CONFIG.md)
 - [Branching strategy](docs/BRANCHING.md)
-
-Provider-agnostic code review guardian for PHP projects. Works with any PHP project: **Symfony**, **Laravel**, **Yii**, **CodeIgniter**, **Slim**, **Laminas**, etc. and any Git provider: **GitHub**, **GitLab**, **Bitbucket**, etc.
 
 ## Tests and coverage
 

@@ -2,6 +2,29 @@
 
 This document describes the configuration options available for Code Review Guardian.
 
+## Table of contents
+
+- [Overview](#overview)
+- [Configuration File](#configuration-file)
+  - [Location](#location)
+  - [Auto-Generation](#auto-generation)
+  - [Composer plugin options](#composer-plugin-options)
+- [Configuration Structure](#configuration-structure)
+- [Configuration Options](#configuration-options)
+  - [Framework Detection](#framework-detection)
+  - [Git Provider Settings](#git-provider-settings)
+  - [Git Guardian Angel (GGA) Settings](#git-guardian-angel-gga-settings)
+  - [AI Agents Configuration](#ai-agents-configuration)
+  - [Code Review Rules](#code-review-rules)
+  - [Comment Settings](#comment-settings)
+- [Framework-Specific Configurations](#framework-specific-configurations)
+  - [Symfony](#symfony)
+  - [Laravel](#laravel)
+  - [Generic PHP](#generic-php)
+- [Environment Variables](#environment-variables)
+  - [`GIT_TOKEN`](#git_token)
+- [Additional Resources](#additional-resources)
+
 ## Overview
 
 Code Review Guardian works out of the box with default settings. The configuration file (`code-review-guardian.yaml`) is **automatically generated** based on your detected framework during installation.

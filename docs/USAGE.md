@@ -1,5 +1,13 @@
 # Usage
 
+## Table of contents
+
+- [Run code review](#run-code-review)
+- [Post a review comment (when available)](#post-a-review-comment-when-available)
+- [Help](#help)
+- [Configuration](#configuration)
+- [Git Guardian Angel (GGA)](#git-guardian-angel-gga)
+
 ## Run code review
 
 From the project root:

@@ -1,5 +1,12 @@
 # Installation
 
+## Table of contents
+
+- [Requirements](#requirements)
+- [Composer](#composer)
+  - [Wrapper script updates](#wrapper-script-updates)
+- [Token for Git providers](#token-for-git-providers)
+
 ## Requirements
 
 - PHP `>= 8.1` and `< 8.6`

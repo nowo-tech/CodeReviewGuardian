@@ -2,6 +2,40 @@
 
 This guide provides step-by-step instructions for creating accounts and obtaining API tokens for different Git providers to use with Code Review Guardian.
 
+## Table of contents
+
+- [Overview](#overview)
+- [GitHub](#github)
+  - [Step 1: Create/Login to GitHub Account](#step-1-createlogin-to-github-account)
+  - [Step 2: Generate Personal Access Token (Classic)](#step-2-generate-personal-access-token-classic)
+  - [Step 3: Add Token to Your Project](#step-3-add-token-to-your-project)
+  - [Step 4: Verify Token](#step-4-verify-token)
+  - [GitHub Fine-Grained Personal Access Tokens (Alternative)](#github-fine-grained-personal-access-tokens-alternative)
+- [GitLab](#gitlab)
+  - [Step 1: Create/Login to GitLab Account](#step-1-createlogin-to-gitlab-account)
+  - [Step 2: Create Personal Access Token](#step-2-create-personal-access-token)
+  - [Step 3: Add Token to Your Project](#step-3-add-token-to-your-project-1)
+  - [Step 4: Verify Token](#step-4-verify-token-1)
+- [Bitbucket](#bitbucket)
+  - [Step 1: Create/Login to Bitbucket Account](#step-1-createlogin-to-bitbucket-account)
+  - [Step 2: Create App Password](#step-2-create-app-password)
+  - [Step 3: Add Password to Your Project](#step-3-add-password-to-your-project)
+  - [Step 4: Verify Token](#step-4-verify-token-2)
+- [Self-Hosted Git Providers](#self-hosted-git-providers)
+  - [GitLab (Self-Hosted)](#gitlab-self-hosted)
+  - [Bitbucket Server/Data Center](#bitbucket-serverdata-center)
+- [CI/CD Configuration](#cicd-configuration)
+  - [GitHub Actions](#github-actions)
+  - [GitLab CI/CD](#gitlab-cicd)
+  - [Bitbucket Pipelines](#bitbucket-pipelines)
+- [Security Best Practices](#security-best-practices)
+- [Troubleshooting](#troubleshooting)
+  - [Token not working](#token-not-working)
+  - [Permission denied errors](#permission-denied-errors)
+  - [Token not found](#token-not-found)
+  - [Rate limiting](#rate-limiting)
+- [Additional Resources](#additional-resources)
+
 ## Overview
 
 Code Review Guardian requires a Git provider API token to post review comments to pull requests and merge requests. This token authenticates your requests to the Git provider's API.

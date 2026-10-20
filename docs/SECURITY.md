@@ -1,5 +1,19 @@
 # Security — Code Review Guardian
 
+## Table of contents
+
+- [Scope](#scope)
+- [Attack surface](#attack-surface)
+- [Threats and mitigations](#threats-and-mitigations)
+- [Secrets and cryptography](#secrets-and-cryptography)
+- [Logging](#logging)
+- [Dependencies](#dependencies)
+- [Permissions and exposure](#permissions-and-exposure)
+- [Reporting a vulnerability](#reporting-a-vulnerability)
+- [AI security audit (REQ-SEC-004)](#ai-security-audit-req-sec-004)
+  - [Residuals (accepted)](#residuals-accepted)
+- [Release security checklist (12.4.1)](#release-security-checklist-1241)
+
 ## Scope
 
 Code Review Guardian is a **development-time** Composer package. It installs scripts and configuration under the consuming project to run code review workflows (including optional integration with AI providers). It does **not** expose HTTP endpoints by itself in the library package.

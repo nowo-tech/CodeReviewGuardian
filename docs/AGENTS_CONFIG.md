@@ -2,6 +2,24 @@
 
 This document explains how to configure AI-powered code review agents for Code Review Guardian.
 
+## Table of contents
+
+- [Overview](#overview)
+- [Configuration](#configuration)
+  - [Environment Variables](#environment-variables)
+  - [Getting Your Git Token](#getting-your-git-token)
+- [Agent Providers](#agent-providers)
+  - [GitHub Copilot](#github-copilot)
+  - [OpenAI](#openai)
+  - [Anthropic Claude](#anthropic-claude)
+- [Agent Configuration](#agent-configuration)
+- [Usage](#usage)
+- [Best Practices](#best-practices)
+- [Troubleshooting](#troubleshooting)
+  - [Agent not working](#agent-not-working)
+  - [Too many suggestions](#too-many-suggestions)
+- [Additional Resources](#additional-resources)
+
 ## Overview
 
 Code Review Guardian supports AI-powered code review agents that can automatically review your pull requests and merge requests. These agents analyze your code for quality, security, and best practices.
