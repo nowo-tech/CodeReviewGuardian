@@ -11,7 +11,7 @@ namespace NowoTech\CodeReviewGuardian;
  *
  * @see    https://github.com/HecFranco
  */
-class FrameworkDetector
+final class FrameworkDetector
 {
     /** @var string Framework constant for Symfony */
     public const FRAMEWORK_SYMFONY = 'symfony';

@@ -32,6 +32,9 @@
 
 ## Unreleased
 
+- `NowoTech\CodeReviewGuardian\Plugin` and `FrameworkDetector` are now `final`. They were never documented extension
+  points; if you extended either class, wrap it (composition) instead.
+
 ## To 1.1.10
 
 From **1.1.9**:

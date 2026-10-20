@@ -20,7 +20,7 @@ use Composer\Script\ScriptEvents;
  *
  * @see    https://github.com/HecFranco
  */
-class Plugin implements PluginInterface, EventSubscriberInterface
+final class Plugin implements PluginInterface, EventSubscriberInterface
 {
     /** @var Composer The Composer instance */
     private Composer $composer;
@@ -388,7 +388,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
         // If package is not in vendor (development mode), use current directory
         if (!is_dir($packageDir)) {
-            $packageDir = __DIR__.'/..';
+            return __DIR__.'/..';
         }
 
         return $packageDir;

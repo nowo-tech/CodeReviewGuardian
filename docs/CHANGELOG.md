@@ -31,6 +31,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `Plugin` and `FrameworkDetector` are `final` (no documented extension point; REQ-PHP-001).
+- Makefile: `release-check` runs `check-open-prs` (new `.scripts/check-open-prs.sh`) and `igor` in REQ-MAKE-002 order; `help` follows the canonical block order (REQ-MAKE-001/002, REQ-CS-008, REQ-REL-003).
+- CI: the PHPStan job also runs on pushes and runs Igor (REQ-CS-005/006/008).
+- Rector capped at 2 parallel workers; `.scripts/check-no-cursor-coauthor.sh` accepts git worktrees (REQ-GIT-001).
+
 ## [1.1.10] - 2026-10-20
 
 Documentation: wave-1 REQ compliance (README, CONTRIBUTING, TOCs). See [UPGRADING](UPGRADING.md#to-1110).
