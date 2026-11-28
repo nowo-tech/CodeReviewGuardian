@@ -9,7 +9,7 @@
 
 ## Requirements
 
-- PHP `>= 8.1` and `< 8.6`
+- PHP `>= 8.1` and `< 8.7`
 - Composer 2.x
 - Git
 
