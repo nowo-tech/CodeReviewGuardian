@@ -60,4 +60,4 @@ jobs:
           fi
 
       - name: Tests
-        run: composer test -- --no-coverage --display-deprecations
+        run: composer test -- --display-deprecations
